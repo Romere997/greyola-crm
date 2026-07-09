@@ -117,7 +117,13 @@ jobs:
           wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
           chmod +x linuxdeploy-x86_64.AppImage
           ./linuxdeploy-x86_64.AppImage --appdir "$APPDIR" --output appimage
-          mv Greyola_CRM-*.AppImage greyola-crm.AppImage 2>/dev/null || true
+          # linuxdeploy names the file from the .desktop Name ("Greyola CRM-*.AppImage")
+          shopt -s nullglob
+          for f in "Greyola CRM"-*.AppImage *.AppImage; do
+            if [ -f "$f" ]; then mv "$f" greyola-crm.AppImage && break; fi
+          done
+          shopt -u nullglob
+          ls -la greyola-crm.AppImage 2>/dev/null && echo "APPIMAGE_BUILT" || echo "APPIMAGE_MISSING"
 
       - name: Upload AppImage artifact
         if: always()
