@@ -1,0 +1,134 @@
+name: Build Linux (greyola-crm)
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build-linux:
+    name: Build one-file Linux binary
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install system WebKitGTK + GTK deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            python3-pip python3-venv \
+            libwebkit2gtk-4.1-dev libgtk-3-0 gir1.2-webkit2-4.1
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python build deps
+        working-directory: linux
+        run: pip install -r requirements.txt
+
+      - name: Sync front-end + build
+        working-directory: linux
+        run: |
+          mkdir -p assets
+          cp "../Greyola CRM.html" assets/crm.html
+          pyinstaller build_linux.spec --noconfirm --clean
+
+      - name: Smoke test the binary (headless import of launcher logic)
+        working-directory: linux
+        run: |
+          python - <<'PY'
+          import importlib.util, os
+          spec = importlib.util.spec_from_file_location("ll", "linux_launcher.py")
+          m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+          html = m._read_html()
+          assert "view-calendar" in html, "front-end missing Calendar"
+          sb = m.StorageBridge()
+          sb.save("t", "1"); assert sb.load("t") == "1"; sb.remove("t")
+          print("LAUNCHER_OK")
+          PY
+          test -x dist/greyola-crm && echo "BINARY_PRESENT"
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: greyola-crm-linux
+          path: linux/dist/greyola-crm
+          if-no-files-found: error
+
+      - name: Attach to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: linux/dist/greyola-crm
+
+  build-appimage:
+    name: Build AppImage (best-effort)
+    runs-on: ubuntu-22.04
+    needs: build-linux
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            python3-pip python3-venv \
+            libwebkit2gtk-4.1-dev libgtk-3-0 \
+            libfuse2
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Build one-file binary
+        working-directory: linux
+        run: |
+          pip install -r requirements.txt
+          mkdir -p assets
+          cp "../Greyola CRM.html" assets/crm.html
+          pyinstaller build_linux.spec --noconfirm --clean
+
+      - name: Package AppImage with linuxdeploy
+        run: |
+          BIN=linux/dist/greyola-crm
+          APPDIR=AppDir
+          mkdir -p "$APPDIR/usr/bin" "$APPDIR/usr/share/applications" "$APPDIR/usr/share/icons/hicolor/256x256/apps"
+          cp "$BIN" "$APPDIR/usr/bin/greyola-crm"
+          cat > "$APPDIR/usr/share/applications/greyola-crm.desktop" <<'DESK'
+          [Desktop Entry]
+          Type=Application
+          Name=Greyola CRM
+          Exec=greyola-crm
+          Categories=Office;Finance;
+          Icon=greyola-crm
+          Comment=Greyola CRM — deal-pipeline desktop app
+          DESK
+          # placeholder icon (PNG); replace with a real branded icon if desired
+          printf '\x89PNG\r\n\x1a\n' > "$APPDIR/usr/share/icons/hicolor/256x256/apps/greyola-crm.png"
+          wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          chmod +x linuxdeploy-x86_64.AppImage
+          ./linuxdeploy-x86_64.AppImage --appdir "$APPDIR" --output appimage
+          mv Greyola_CRM-*.AppImage greyola-crm.AppImage 2>/dev/null || true
+
+      - name: Upload AppImage artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: greyola-crm-appimage
+          path: greyola-crm.AppImage
+          if-no-files-found: warn
+
+      - name: Attach to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: greyola-crm.AppImage
