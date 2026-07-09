@@ -26,6 +26,7 @@ A self-contained sales / deal-pipeline CRM that runs as a **native Windows deskt
 | `make_icon.py` | Generates `greyola.ico` |
 | `installer/` | iexpress-based installer (Start Menu + desktop shortcut + uninstaller) |
 | `assets/crm.html` | Copy of the source, bundled into the `.exe` at build time |
+| `linux/` | Native **Linux** build (GTK/WebKit2 backend) — `linux_launcher.py`, `build_linux.spec`, `build_linux.sh` |
 
 ## Building the Windows app
 ```bash
@@ -34,6 +35,15 @@ cp "Greyola CRM.html" assets/crm.html
 python -m PyInstaller build.spec --noconfirm --clean
 # result: dist/Greyola CRM.exe
 ```
+
+## Building the Linux app
+```bash
+cd linux
+# install system WebKitGTK deps first (see linux/README.md)
+bash build_linux.sh
+# result: dist/greyola-crm  (single Linux binary)
+```
+See [linux/README.md](linux/README.md) for distro-specific WebKit2 GTK packages.
 
 ## Building the installer
 ```bash

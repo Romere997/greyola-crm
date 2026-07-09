@@ -1,0 +1,2207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Greyola CRM</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#f2f2f0;
+  --surface:#ffffff;
+  --surface2:#fafaf8;
+  --border:#e6e6e3;
+  --border2:#ededea;
+  --text-primary:#0d0d0b;
+  --text-secondary:#5c5c59;
+  --text-muted:#9c9c99;
+  --green:#4ade80;
+  --green-dark:#16a34a;
+  --green-bg:#f0fdf4;
+  --red:#f43f5e;
+  --red-bg:#fff1f2;
+  --black:#0d0d0b;
+  --radius:16px;
+  --radius-sm:10px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-md:0 4px 16px rgba(0,0,0,.08),0 2px 6px rgba(0,0,0,.04);
+  --shadow-lg:0 12px 40px rgba(0,0,0,.14),0 4px 16px rgba(0,0,0,.06);
+}
+
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text-primary);display:flex;min-height:100vh;font-size:14px;line-height:1.5;overflow-x:hidden}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  width:64px;background:var(--black);
+  display:flex;flex-direction:column;align-items:center;
+  padding:18px 0 18px;gap:4px;
+  position:fixed;top:0;left:0;bottom:0;z-index:200;
+}
+.s-logo{
+  width:34px;height:34px;background:var(--green);border-radius:9px;
+  display:flex;align-items:center;justify-content:center;margin-bottom:22px;flex-shrink:0;
+  cursor:pointer;transition:transform .2s;
+}
+.s-logo:hover{transform:scale(1.06)}
+.s-logo svg{width:18px;height:18px}
+.s-icon{
+  width:38px;height:38px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:#555;transition:background .15s,color .15s;
+  position:relative;
+}
+.s-icon:hover{background:#1c1c1a;color:#bbb}
+.s-icon.active{background:#1c1c1a;color:var(--green)}
+.s-icon svg{width:17px;height:17px}
+.s-icon .badge{
+  position:absolute;top:5px;right:5px;
+  width:7px;height:7px;border-radius:50%;
+  background:var(--red);border:1.5px solid var(--black);
+}
+.s-sep{width:28px;height:1px;background:#222;margin:8px 0}
+.s-bottom{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:10px}
+.s-avatar{
+  width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(135deg,#667eea,#764ba2);
+  display:flex;align-items:center;justify-content:center;
+  color:white;font-weight:700;font-size:11px;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;
+  border:2px solid #222;transition:border-color .15s;flex-shrink:0;
+}
+.s-avatar:hover{border-color:#555}
+
+/* ── MAIN ── */
+.main{margin-left:64px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* ── TOPNAV ── */
+.topnav{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:0 24px;height:54px;
+  display:flex;align-items:center;gap:0;
+  position:sticky;top:0;z-index:100;
+}
+.breadcrumb{font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:5px;white-space:nowrap}
+.breadcrumb .sep{opacity:.5}
+.breadcrumb .current{color:var(--text-primary);font-weight:600}
+.nav-tabs{display:flex;gap:2px;margin-left:28px}
+.nav-tab{
+  padding:5px 13px;border-radius:20px;font-size:12.5px;font-weight:500;
+  cursor:pointer;color:var(--text-secondary);transition:all .15s;white-space:nowrap;
+}
+.nav-tab.active{background:var(--black);color:#fff}
+.nav-tab:hover:not(.active){background:var(--bg)}
+.topnav-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.team-avs{display:flex;align-items:center}
+.tav{
+  width:26px;height:26px;border-radius:50%;border:2px solid var(--surface);
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:700;color:white;margin-left:-5px;
+}
+.tav:first-child{margin-left:0}
+.tav-count{background:var(--bg);color:var(--text-secondary);font-size:9px;font-weight:700}
+.tn-btn{
+  padding:5px 12px;background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;
+  display:flex;align-items:center;gap:4px;color:var(--text-primary);
+  transition:background .15s;font-family:inherit;
+}
+.tn-btn:hover{background:var(--bg)}
+.tn-btn.primary{background:var(--black);color:#fff;border-color:var(--black)}
+.tn-btn.primary:hover{background:#222}
+.icon-btn{
+  width:32px;height:32px;background:transparent;border:none;
+  border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--text-secondary);transition:background .15s;position:relative;
+}
+.icon-btn:hover{background:var(--bg)}
+.icon-btn .dot{position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--red);border:1.5px solid var(--surface)}
+.date-chip{
+  padding:4px 10px;border:1px solid var(--border);border-radius:20px;
+  font-size:11px;font-weight:500;color:var(--text-secondary);
+  display:flex;align-items:center;gap:5px;
+}
+
+/* ── CONTENT ── */
+.content{padding:24px;flex:1}
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:20px}
+.page-title{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1}
+.page-sub{font-size:12.5px;color:var(--text-muted);margin-top:3px}
+.page-actions{display:flex;gap:8px}
+
+/* ── KPI GRID ── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+.kpi-card{
+  background:var(--surface);border-radius:var(--radius);padding:18px 20px;
+  border:1px solid var(--border);box-shadow:var(--shadow);
+  position:relative;overflow:hidden;cursor:default;
+  transition:box-shadow .2s,transform .2s;
+}
+.kpi-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px)}
+.kpi-card.dark{background:var(--black);border-color:var(--black)}
+.kpi-label{font-size:10.5px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
+.kpi-card.dark .kpi-label{color:#555}
+.kpi-value{font-size:28px;font-weight:800;letter-spacing:-1.2px;line-height:1;margin-bottom:12px}
+.kpi-card.dark .kpi-value{color:#fff}
+.kpi-value .cents{font-size:16px;font-weight:500;letter-spacing:0}
+.kpi-footer{display:flex;align-items:center;justify-content:space-between}
+.kpi-badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700}
+.bg-green{background:var(--green-bg);color:var(--green-dark)}
+.bg-red{background:var(--red-bg);color:#e11d48}
+.bg-green-inv{background:var(--green);color:#0a3d1f}
+.kpi-spark{position:absolute;bottom:0;right:0;width:90px;height:44px;pointer-events:none}
+.kpi-actions{display:flex;gap:5px}
+.kpi-action-btn{
+  width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.08);
+  border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:#aaa;transition:background .15s;
+}
+.kpi-action-btn:hover{background:rgba(255,255,255,.15);color:#fff}
+
+/* ── MAIN GRID ── */
+.dash-grid{display:grid;grid-template-columns:1fr 320px;gap:12px}
+.left-col{display:flex;flex-direction:column;gap:12px}
+.right-col{display:flex;flex-direction:column;gap:12px}
+
+/* ── CARD ── */
+.card{
+  background:var(--surface);border-radius:var(--radius);
+  border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;
+}
+.card-hd{
+  padding:16px 18px 12px;
+  display:flex;align-items:flex-start;justify-content:space-between;
+}
+.card-title{font-size:13.5px;font-weight:700;letter-spacing:-.2px}
+.card-sub{font-size:11px;color:var(--text-muted);margin-top:1px}
+.card-hd-right{display:flex;align-items:center;gap:6px}
+.exp-btn{
+  width:26px;height:26px;border-radius:7px;background:var(--bg);border:none;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--text-secondary);transition:background .15s;
+}
+.exp-btn:hover{background:var(--border)}
+
+/* ── PORTFOLIO BREAKDOWN ── */
+.pb-list{padding:0 18px 14px}
+.pb-item{
+  display:flex;align-items:center;gap:10px;padding:9px 0;
+  border-bottom:1px solid var(--border2);cursor:pointer;
+  transition:background .12s;border-radius:8px;
+  padding-left:6px;padding-right:6px;margin:0 -6px;
+}
+.pb-item:last-child{border-bottom:none}
+.pb-item:hover{background:var(--bg)}
+.pb-icon{
+  width:34px;height:34px;border-radius:10px;background:var(--black);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  font-size:15px;color:#fff;font-weight:700;
+}
+.pb-info{flex:1;min-width:0}
+.pb-name{font-size:13px;font-weight:600}
+.pb-meta{font-size:11px;color:var(--text-muted)}
+.pb-right{text-align:right;flex-shrink:0}
+.pb-amount{font-size:13px;font-weight:700}
+.pb-date{font-size:10.5px;color:var(--text-muted)}
+.pb-status{
+  display:inline-flex;align-items:center;gap:3px;
+  padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;
+}
+.status-proc{background:#fef3c7;color:#d97706}
+.status-done{background:var(--green-bg);color:var(--green-dark)}
+.status-neg{background:var(--red-bg);color:var(--red)}
+
+/* ── CHART ── */
+.chart-wrap{padding:0 18px 18px;position:relative}
+.chart-legend{display:flex;gap:14px;padding:0 18px 10px;flex-wrap:wrap;flex-shrink:0}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-muted);font-weight:500}
+.legend-dot{width:8px;height:8px;border-radius:50%}
+.chart-canvas-wrap{position:relative}
+canvas#revenueChart{width:100%;cursor:crosshair}
+.chart-tooltip{
+  position:absolute;background:var(--black);color:#fff;
+  padding:7px 11px;border-radius:10px;font-size:11px;font-weight:700;
+  pointer-events:none;opacity:0;transition:opacity .12s;white-space:nowrap;
+  box-shadow:var(--shadow-md);
+}
+.chart-months{display:flex;justify-content:space-between;padding:6px 0 0;font-size:10px;color:var(--text-muted);font-weight:500}
+
+/* ── DEAL TABLE ── */
+.deal-table{width:100%;border-collapse:collapse}
+.deal-table th{
+  padding:7px 16px;font-size:10.5px;font-weight:600;color:var(--text-muted);
+  text-align:left;border-bottom:1px solid var(--border);
+  text-transform:uppercase;letter-spacing:.5px;background:var(--surface2);
+}
+.deal-table td{padding:11px 16px;border-bottom:1px solid var(--border2);vertical-align:middle}
+.deal-table tr:last-child td{border-bottom:none}
+.deal-table tr:hover td{background:var(--bg);cursor:pointer}
+.deal-name{font-weight:700;font-size:12.5px}
+.deal-co{font-size:10.5px;color:var(--text-muted);margin-top:1px}
+.chip{display:flex;align-items:center;gap:6px}
+.mav{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;color:white;flex-shrink:0}
+.stage-pill{padding:2px 9px;border-radius:20px;font-size:10.5px;font-weight:700}
+.s-prop{background:#fef9c3;color:#a16207}
+.s-neg{background:#ede9fe;color:#7c3aed}
+.s-qual{background:var(--green-bg);color:var(--green-dark)}
+.s-disc{background:#fff7ed;color:#c2410c}
+.s-closed{background:#dcfce7;color:#15803d}
+.deal-val{font-weight:800;font-size:13px;letter-spacing:-.3px}
+.prob-wrap{width:72px}
+.prob-lbl{font-size:9.5px;color:var(--text-muted);margin-bottom:3px;font-weight:600}
+.prob-track{height:4px;background:var(--border);border-radius:2px}
+.prob-fill{height:100%;background:var(--green);border-radius:2px}
+
+/* ── PANEL OVERLAY ── */
+.panel-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:300;
+  opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(2px);
+}
+.panel-overlay.open{opacity:1;pointer-events:all}
+.side-panel{
+  position:fixed;top:0;right:0;bottom:0;width:400px;
+  background:var(--surface);z-index:400;
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  overflow-y:auto;display:flex;flex-direction:column;
+  box-shadow:var(--shadow-lg);
+}
+.side-panel.open{transform:translateX(0)}
+.panel-hd{
+  padding:20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-start;gap:12px;position:sticky;top:0;
+  background:var(--surface);z-index:1;
+}
+.panel-close{
+  width:30px;height:30px;border-radius:8px;background:var(--bg);border:none;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--text-secondary);margin-left:auto;flex-shrink:0;
+  transition:background .15s;
+}
+.panel-close:hover{background:var(--border)}
+.panel-badge-row{display:flex;gap:6px;flex-wrap:wrap;padding:16px 20px 0}
+.panel-body{padding:0 20px 20px}
+.panel-section{margin-top:20px}
+.panel-section-title{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px}
+.panel-field{margin-bottom:12px}
+.panel-field-label{font-size:11px;color:var(--text-muted);font-weight:500;margin-bottom:3px}
+.panel-field-val{font-size:13.5px;font-weight:600}
+.panel-field-val.big{font-size:22px;font-weight:800;letter-spacing:-.5px}
+.panel-actions{display:flex;gap:8px;padding:16px 20px;border-bottom:1px solid var(--border)}
+.p-btn{
+  flex:1;padding:9px;border-radius:10px;font-size:12.5px;font-weight:700;
+  cursor:pointer;border:1px solid var(--border);background:var(--bg);
+  color:var(--text-primary);transition:all .15s;font-family:inherit;
+}
+.p-btn:hover{background:var(--border)}
+.p-btn.primary{background:var(--black);color:#fff;border-color:var(--black)}
+.p-btn.primary:hover{background:#222}
+.timeline{padding-left:4px}
+.tl-item{display:flex;gap:10px;margin-bottom:14px}
+.tl-dot{width:8px;height:8px;border-radius:50%;background:var(--green);margin-top:5px;flex-shrink:0;position:relative}
+.tl-dot::before{content:'';position:absolute;left:3px;top:9px;width:2px;height:18px;background:var(--border)}
+.tl-item:last-child .tl-dot::before{display:none}
+.tl-title{font-size:12.5px;font-weight:600}
+.tl-time{font-size:10.5px;color:var(--text-muted);margin-top:2px}
+
+/* ── NOTIFICATIONS ── */
+.notif-tabs{display:flex;gap:4px;padding:0 18px 10px}
+.ntab{padding:4px 11px;border-radius:20px;border:1px solid var(--border);font-size:11px;font-weight:600;cursor:pointer;color:var(--text-secondary);transition:all .12s;font-family:inherit;background:var(--surface)}
+.ntab.active{background:var(--black);color:#fff;border-color:var(--black)}
+.notif-item{
+  display:flex;align-items:flex-start;gap:10px;padding:11px 18px;
+  border-bottom:1px solid var(--border2);cursor:pointer;transition:background .12s;position:relative;
+}
+.notif-item:last-child{border-bottom:none}
+.notif-item:hover{background:var(--bg)}
+.notif-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.notif-body{flex:1;min-width:0}
+.notif-title{font-size:12.5px;font-weight:700}
+.notif-desc{font-size:11px;color:var(--text-muted);margin-top:2px;line-height:1.4}
+.notif-time{font-size:10px;color:var(--text-muted);margin-top:3px}
+.notif-dot{width:7px;height:7px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:5px}
+.notif-btns{display:flex;gap:5px;margin-top:7px}
+.nb{padding:3px 11px;border-radius:20px;font-size:10.5px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text-primary);transition:all .12s;font-family:inherit}
+.nb.primary{background:var(--black);color:#fff;border-color:var(--black)}
+
+/* ── CONTACTS ── */
+.contact-row{
+  display:flex;align-items:center;gap:10px;padding:10px 18px;
+  border-bottom:1px solid var(--border2);transition:background .12s;cursor:pointer;
+}
+.contact-row:last-child{border-bottom:none}
+.contact-row:hover{background:var(--bg)}
+.av-wrap{position:relative;flex-shrink:0}
+.c-av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white}
+.online{position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;background:var(--green);border:2px solid var(--surface)}
+.c-info{flex:1;min-width:0}
+.c-name{font-size:13px;font-weight:700}
+.c-role{font-size:10.5px;color:var(--text-muted)}
+.c-val{font-size:12.5px;font-weight:700;color:var(--text-secondary);flex-shrink:0}
+
+/* ── MESSAGES ── */
+.msg-search{
+  display:flex;align-items:center;gap:8px;
+  margin:0 18px 10px;padding:7px 11px;
+  background:var(--bg);border-radius:10px;border:1px solid var(--border);
+}
+.msg-search input{
+  border:none;background:transparent;font-size:12px;color:var(--text-primary);
+  font-family:inherit;outline:none;flex:1;
+}
+.msg-search input::placeholder{color:var(--text-muted)}
+.msg-item{
+  display:flex;align-items:flex-start;gap:10px;padding:10px 18px;
+  border-bottom:1px solid var(--border2);cursor:pointer;transition:background .12s;
+}
+.msg-item:last-child{border-bottom:none}
+.msg-item:hover{background:var(--bg)}
+.msg-item.unread .msg-name{font-weight:800}
+.msg-av{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;position:relative}
+.msg-av .online{width:8px;height:8px}
+.msg-right{flex:1;min-width:0}
+.msg-row{display:flex;align-items:center;justify-content:space-between}
+.msg-name{font-size:12.5px;font-weight:600}
+.msg-time{font-size:10px;color:var(--text-muted)}
+.msg-preview{font-size:11px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.msg-unread-badge{min-width:16px;height:16px;background:var(--green);border-radius:8px;font-size:9px;font-weight:800;color:#0a3d1f;display:flex;align-items:center;justify-content:center;padding:0 4px;flex-shrink:0;margin-top:1px}
+
+/* ── PERFORMANCE CARD ── */
+.perf-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:11px 18px;border-bottom:1px solid var(--border2);
+}
+.perf-row:last-child{border-bottom:none}
+.perf-left{}
+.perf-name{font-size:13px;font-weight:600}
+.perf-sub{font-size:10.5px;color:var(--text-muted);margin-top:1px}
+.perf-right{text-align:right}
+.perf-val{font-size:15px;font-weight:800;letter-spacing:-.3px}
+.perf-change{font-size:10.5px;font-weight:700;margin-top:2px}
+.pos{color:var(--green-dark)}
+.neg{color:var(--red)}
+
+/* ── FUNNEL ── */
+.funnel-wrap{padding:14px 18px 16px}
+.f-stage{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.f-stage:last-child{margin-bottom:0}
+.f-label{width:76px;font-size:11px;font-weight:600;color:var(--text-secondary);flex-shrink:0}
+.f-track{flex:1;height:18px;background:var(--bg);border-radius:4px;overflow:hidden}
+.f-bar{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:7px;font-size:9.5px;font-weight:800;color:white;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.f-count{width:24px;text-align:right;font-size:11.5px;font-weight:700;color:var(--text-primary);flex-shrink:0}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.kpi-card{animation:fadeUp .35s ease both}
+.kpi-card:nth-child(1){animation-delay:.04s}
+.kpi-card:nth-child(2){animation-delay:.08s}
+.kpi-card:nth-child(3){animation-delay:.12s}
+.kpi-card:nth-child(4){animation-delay:.16s}
+.card{animation:fadeUp .4s ease both}
+.left-col .card:nth-child(1){animation-delay:.18s}
+.left-col .card:nth-child(2){animation-delay:.24s}
+.left-col .card:nth-child(3){animation-delay:.30s}
+.right-col .card:nth-child(1){animation-delay:.20s}
+.right-col .card:nth-child(2){animation-delay:.26s}
+.right-col .card:nth-child(3){animation-delay:.32s}
+.right-col .card:nth-child(4){animation-delay:.38s}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#ddd;border-radius:2px}
+::-webkit-scrollbar-thumb:hover{background:#ccc}
+
+/* ── MOBILE BOTTOM NAV ── */
+.mobile-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--black);
+  z-index:200;
+  padding:8px 0 max(8px, env(safe-area-inset-bottom));
+  border-top:1px solid #1c1c1a;
+}
+.mobile-nav-inner{display:flex;justify-content:space-around;align-items:center}
+.mn-item{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;color:#555;padding:4px 12px;border-radius:10px;
+  transition:color .15s;position:relative;min-width:44px;
+}
+.mn-item.active{color:var(--green)}
+.mn-item svg{width:20px;height:20px}
+.mn-label{font-size:9.5px;font-weight:600;letter-spacing:.2px}
+.mn-badge{
+  position:absolute;top:2px;right:8px;
+  width:7px;height:7px;border-radius:50%;
+  background:var(--red);border:1.5px solid var(--black);
+}
+
+/* ── MOBILE HEADER ── */
+.mobile-header{
+  display:none;
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:0 16px;height:54px;
+  align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.mh-logo{
+  width:30px;height:30px;background:var(--green);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+}
+.mh-logo svg{width:16px;height:16px}
+.mh-title{font-size:15px;font-weight:800;letter-spacing:-.3px}
+.mh-right{display:flex;align-items:center;gap:6px}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  /* hide desktop sidebar & topnav, show mobile equivalents */
+  .sidebar{display:none}
+  .topnav{display:none}
+  .mobile-header{display:flex}
+  .mobile-nav{display:block}
+
+  .main{margin-left:0;padding-bottom:80px}
+  .content{padding:14px 14px 0}
+
+  /* page header stacks */
+  .page-header{flex-direction:column;align-items:flex-start;gap:12px;margin-bottom:16px}
+  .page-title{font-size:22px}
+  .page-actions{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .page-actions .tn-btn{justify-content:center;padding:9px 12px;border-radius:10px;font-size:12.5px}
+
+  /* KPIs: 2 columns, horizontally scrollable */
+  .kpi-grid{
+    display:flex;gap:10px;
+    overflow-x:auto;scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    margin:0 -14px 14px;padding:0 14px 4px;
+    scrollbar-width:none;
+  }
+  .kpi-grid::-webkit-scrollbar{display:none}
+  .kpi-card{
+    min-width:160px;flex-shrink:0;
+    scroll-snap-align:start;
+    padding:14px 16px;
+  }
+  .kpi-value{font-size:22px;letter-spacing:-.8px;margin-bottom:8px}
+  .kpi-value .cents{font-size:13px}
+  .kpi-spark{width:70px;height:36px}
+
+  /* dash grid: single column */
+  .dash-grid{grid-template-columns:1fr;gap:10px}
+
+  /* portfolio + perf: stack vertically */
+  .left-col>div:first-child{display:flex;flex-direction:column;gap:10px}
+  .left-col>div:first-child>.card{min-width:0}
+
+  /* deal table: horizontally scrollable with min column widths */
+  .deal-table th,.deal-table td{padding:9px 12px;white-space:nowrap}
+  .deal-table th:nth-child(5),.deal-table td:nth-child(5){display:none} /* hide close date */
+  
+  /* side panel goes full screen on mobile */
+  .side-panel{width:100%;top:0}
+
+  /* chart months fewer labels */
+  .chart-months span:nth-child(even){display:none}
+  .chart-wrap{padding:0 12px 14px}
+
+  /* cards tighter */
+  .card-hd{padding:14px 14px 10px}
+  .pb-list{padding:0 14px 10px}
+  .pb-item{padding-left:4px;padding-right:4px;margin:0 -4px}
+  .perf-row{padding:10px 14px}
+  .notif-item{padding:10px 14px}
+  .contact-row{padding:10px 14px}
+  .msg-item{padding:9px 14px}
+  .msg-search{margin:0 14px 10px}
+  .funnel-wrap{padding:12px 14px 14px}
+  .f-label{width:68px;font-size:10.5px}
+
+  /* panel actions bigger tap targets */
+  .p-btn{padding:11px;font-size:13px}
+
+  /* notifications tab row */
+  .ntab{padding:5px 13px;font-size:11.5px}
+
+  /* right col cards move below left col naturally */
+  .right-col{gap:10px}
+}
+
+@media(max-width:420px){
+  .kpi-card{min-width:145px}
+  .kpi-value{font-size:20px}
+  .page-title{font-size:20px}
+  .deal-table th:nth-child(2),.deal-table td:nth-child(2){display:none} /* hide contact on very small */
+}
+
+/* ── VIEWS ── */
+.view{display:none}
+.view.active{display:block;animation:fadeUp .35s ease both}
+
+/* filter select */
+.filter-select{padding:6px 10px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;font-family:inherit;background:var(--surface);color:var(--text-primary);cursor:pointer}
+
+/* contacts grid */
+.contact-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.contact-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);cursor:pointer;transition:box-shadow .2s,transform .2s;position:relative;overflow:hidden}
+.contact-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.cc-top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.cc-av{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0}
+.cc-name{font-size:15px;font-weight:800;letter-spacing:-.3px}
+.cc-role{font-size:11.5px;color:var(--text-muted)}
+.cc-value{font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:10px}
+.cc-meta{display:flex;gap:6px;flex-wrap:wrap}
+.cc-chip{padding:3px 9px;border-radius:20px;font-size:10.5px;font-weight:700;background:var(--bg);color:var(--text-secondary)}
+
+/* messages layout */
+.msg-layout{display:grid;grid-template-columns:340px 1fr;gap:12px;align-items:start}
+.msg-list-card{display:flex;flex-direction:column;max-height:calc(100vh - 140px)}
+.conversation-item{display:flex;align-items:flex-start;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .12s}
+.conversation-item:hover{background:var(--bg)}
+.conversation-item.active{background:var(--surface2)}
+.msg-thread-card{min-height:calc(100vh - 140px);display:flex;flex-direction:column}
+.thread-body{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:10px;background:var(--surface2)}
+.bubble{max-width:74%;padding:9px 13px;border-radius:14px;font-size:13px;line-height:1.45;box-shadow:var(--shadow);word-wrap:break-word}
+.bubble.them{background:var(--surface);border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:4px}
+.bubble.me{background:var(--black);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.bubble .t-time{display:block;font-size:9.5px;opacity:.6;margin-top:4px}
+.compose{display:flex;gap:8px;padding:14px;border-top:1px solid var(--border)}
+.compose input{flex:1;padding:10px 13px;border:1px solid var(--border);border-radius:12px;font-size:13px;font-family:inherit;background:var(--surface);color:var(--text-primary);outline:none}
+.compose input:focus{border-color:var(--black)}
+
+/* empty state */
+.empty-state{padding:70px 24px;text-align:center;color:var(--text-muted);font-size:13px;flex:1;display:flex;align-items:center;justify-content:center}
+
+/* modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(2px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:var(--radius);width:100%;max-width:460px;box-shadow:var(--shadow-lg);animation:fadeUp .25s ease both;max-height:90vh;overflow-y:auto}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid var(--border)}
+.modal-body{padding:20px;display:flex;flex-direction:column;gap:13px}
+.modal-body label{display:flex;flex-direction:column;gap:5px;font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.4px}
+.modal-body input,.modal-body select{padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13.5px;font-family:inherit;background:var(--surface2);color:var(--text-primary);text-transform:none;letter-spacing:0;font-weight:500;outline:none}
+.modal-body input:focus,.modal-body select:focus{border-color:var(--black)}
+.modal-body .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-ft{display:flex;gap:8px;padding:16px 20px;border-top:1px solid var(--border)}
+
+/* toast */
+.toast-wrap{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);z-index:600;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.toast{background:var(--black);color:#fff;padding:11px 18px;border-radius:13px;font-size:12.5px;font-weight:700;box-shadow:var(--shadow-lg);animation:fadeUp .25s ease both;transition:opacity .3s}
+
+/* notifications */
+.notif-item.read .notif-dot{display:none}
+.notif-item.hide{display:none}
+.notif-item.resolving{opacity:0;transform:translateX(20px);transition:all .28s}
+
+/* ── CALENDAR ── */
+.cal-wrap{display:grid;grid-template-columns:1fr 320px;gap:12px}
+.cal-grid-card{}
+.cal-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.cal-nav{display:flex;align-items:center;gap:8px}
+.cal-nav button{width:32px;height:32px;border-radius:9px;border:1px solid var(--border);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-secondary);transition:background .15s;font-family:inherit}
+.cal-nav button:hover{background:var(--bg)}
+.cal-month{font-size:17px;font-weight:800;letter-spacing:-.3px;min-width:170px;text-align:center}
+.cal-weekdays{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px}
+.cal-weekdays div{text-align:center;font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.4px;padding:4px 0}
+.cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal-day{position:relative;min-height:78px;background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:6px 6px 4px;cursor:pointer;transition:border-color .12s,background .12s;overflow:hidden}
+.cal-day:hover{border-color:var(--black)}
+.cal-day.out{opacity:.4;background:transparent}
+.cal-day.today{border-color:var(--green);box-shadow:inset 0 0 0 1px var(--green)}
+.cal-day.sel{background:var(--green-bg)}
+.cal-dnum{font-size:12px;font-weight:700;color:var(--text-primary)}
+.cal-day.out .cal-dnum{color:var(--text-muted)}
+.cal-events{margin-top:3px;display:flex;flex-direction:column;gap:2px}
+.cal-ev{font-size:9.5px;font-weight:700;color:#fff;border-radius:5px;padding:2px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+.cal-more{font-size:9px;font-weight:700;color:var(--text-muted);padding-left:2px}
+.cal-side-card .pb-item{cursor:pointer}
+.cal-side-section-title{font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.cal-empty{font-size:12px;color:var(--text-muted);padding:14px 4px;text-align:center}
+
+/* ── SETTINGS ── */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.set-card .card-hd{margin-bottom:4px}
+.set-field{margin-bottom:14px}
+.set-field:last-child{margin-bottom:0}
+.set-field label{display:block;font-size:11px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px}
+.set-input{padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:13.5px;font-family:inherit;background:var(--surface2);color:var(--text-primary);width:100%;outline:none}
+.set-input:focus{border-color:var(--black)}
+.set-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid var(--border2)}
+.set-row:last-child{border-bottom:none}
+.set-row .sr-label{font-size:13.5px;font-weight:600}
+.set-row .sr-sub{font-size:11px;color:var(--text-muted);margin-top:1px}
+/* toggle switch */
+.switch{position:relative;width:42px;height:24px;flex-shrink:0;cursor:pointer}
+.switch input{opacity:0;width:0;height:0}
+.switch .track{position:absolute;inset:0;background:var(--border);border-radius:20px;transition:background .2s}
+.switch .knob{position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .2s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.switch input:checked + .track{background:var(--green)}
+.switch input:checked + .track + .knob{transform:translateX(18px)}
+/* accent swatches */
+.accent-row{display:flex;gap:8px;flex-wrap:wrap}
+.accent-dot{width:28px;height:28px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .12s}
+.accent-dot:hover{transform:scale(1.1)}
+.accent-dot.sel{border-color:var(--text-primary)}
+.set-profile{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.set-profile .av{width:52px;height:52px;border-radius:14px;background:var(--green);color:#0a3d1f;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;flex-shrink:0}
+.danger-btn{background:var(--red-bg);color:var(--red);border:1px solid #fecdd3}
+.danger-btn:hover{background:#fee2e4}
+.about-row{display:flex;justify-content:space-between;font-size:12.5px;padding:7px 0;border-bottom:1px solid var(--border2)}
+.about-row:last-child{border-bottom:none}
+.about-row span:first-child{color:var(--text-muted)}
+
+/* appearance toggles */
+body.reduce-motion *{animation:none !important;transition:none !important}
+body.compact .kpi-card{padding:12px 14px}
+body.compact .card-hd{padding:12px 14px 8px}
+body.compact .pb-item{padding:7px 0}
+body.compact .perf-row,body.compact .contact-row,body.compact .msg-item,body.compact .notif-item{padding:8px 14px}
+body.compact .cal-day{min-height:62px}
+
+@media(max-width:768px){
+  .cal-wrap{grid-template-columns:1fr}
+  .settings-grid{grid-template-columns:1fr}
+  .msg-layout{grid-template-columns:1fr}
+  .msg-list-card{max-height:none}
+  .modal{max-width:100%}
+  .modal-body .row{grid-template-columns:1fr}
+}
+
+</style>
+</head>
+<body>
+
+<!-- MOBILE HEADER -->
+<header class="mobile-header">
+  <div class="mh-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+      <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+    </svg>
+  </div>
+  <div class="mh-title">Greyola</div>
+  <div class="mh-right">
+    <button class="icon-btn" style="color:var(--text-secondary)">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
+    <button class="icon-btn" style="color:var(--text-secondary);position:relative">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="dot"></div>
+    </button>
+    <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:11px;font-family:inherit">GR</div>
+  </div>
+</header>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <div class="mn-item active" onclick="mobileNav(this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+      <span class="mn-label">Overview</span>
+    </div>
+    <div class="mn-item" onclick="mobileNav(this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span class="mn-label">Contacts</span>
+    </div>
+    <div class="mn-item" onclick="mobileNav(this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+      <span class="mn-label">Deals</span>
+    </div>
+    <div class="mn-item" onclick="mobileNav(this)" style="position:relative">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span class="mn-label">Messages</span>
+      <div class="mn-badge"></div>
+    </div>
+    <div class="mn-item" onclick="mobileNav(this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span class="mn-label">Analytics</span>
+    </div>
+    <div class="mn-item" onclick="mobileNav(this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span class="mn-label">Calendar</span>
+    </div>
+    <div class="mn-item" onclick="mobileNav(this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span class="mn-label">Settings</span>
+    </div>
+  </div>
+</nav>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="s-logo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/>
+      <rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>
+    </svg>
+  </div>
+  <div class="s-icon active" title="Overview">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+  </div>
+  <div class="s-icon" title="Contacts">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+  </div>
+  <div class="s-icon" title="Deals">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+  </div>
+  <div class="s-icon" title="Analytics">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+  </div>
+  <div class="s-icon" title="Messages">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <div class="badge"></div>
+  </div>
+  <div class="s-sep"></div>
+  <div class="s-icon" title="Calendar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+  </div>
+  <div class="s-icon" title="Settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </div>
+  <div class="s-bottom">
+    <div class="s-avatar">GR</div>
+  </div>
+</aside>
+
+<!-- DEAL DETAIL PANEL -->
+<div class="panel-overlay" id="overlay" onclick="closePanel()"></div>
+<div class="side-panel" id="sidePanel">
+  <div class="panel-hd">
+    <div>
+      <div style="font-size:11px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Deal Details</div>
+      <div style="font-size:18px;font-weight:800;letter-spacing:-.4px" id="panelTitle">—</div>
+      <div style="font-size:11.5px;color:var(--text-muted);margin-top:2px" id="panelCompany">—</div>
+    </div>
+    <button class="panel-close" onclick="closePanel()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="panel-actions">
+    <button class="p-btn">📞 Call</button>
+    <button class="p-btn">✉️ Email</button>
+    <button class="p-btn primary">Edit Deal</button>
+  </div>
+  <div class="panel-badge-row" id="panelBadges"></div>
+  <div class="panel-body">
+    <div class="panel-section">
+      <div class="panel-section-title">Financials</div>
+      <div class="panel-field">
+        <div class="panel-field-label">Deal Value</div>
+        <div class="panel-field-val big" id="panelValue">—</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="panel-field">
+          <div class="panel-field-label">Win Probability</div>
+          <div class="panel-field-val" id="panelProb">—</div>
+        </div>
+        <div class="panel-field">
+          <div class="panel-field-label">Expected Close</div>
+          <div class="panel-field-val" id="panelClose">—</div>
+        </div>
+        <div class="panel-field">
+          <div class="panel-field-label">Stage</div>
+          <div id="panelStage">—</div>
+        </div>
+        <div class="panel-field">
+          <div class="panel-field-label">Owner</div>
+          <div class="panel-field-val" id="panelOwner">—</div>
+        </div>
+      </div>
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">Activity Timeline</div>
+      <div class="timeline" id="panelTimeline"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <nav class="topnav">
+    <div class="breadcrumb">
+      <span>Home Page</span>
+      <span class="sep">→</span>
+      <span class="current" id="breadcrumbCurrent">Dashboard</span>
+    </div>
+    <div class="nav-tabs">
+      <div class="nav-tab active">Overview</div>
+      <div class="nav-tab">Customers</div>
+      <div class="nav-tab">Pipeline</div>
+      <div class="nav-tab">Analytics</div>
+      <div class="nav-tab">Activity</div>
+    </div>
+    <div class="topnav-right">
+      <div class="team-avs">
+        <div class="tav" style="background:#667eea;z-index:5">AM</div>
+        <div class="tav" style="background:#f59e0b;z-index:4">JL</div>
+        <div class="tav" style="background:#10b981;z-index:3">RK</div>
+        <div class="tav tav-count" style="z-index:2">+5</div>
+      </div>
+      <button class="tn-btn primary" style="gap:5px">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Add manager
+      </button>
+      <button class="icon-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </button>
+      <button class="icon-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <div class="dot"></div>
+      </button>
+      <div class="date-chip">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        20 – 27 Jan, 2026
+      </div>
+    </div>
+  </nav>
+
+  <div class="content">
+    <section id="view-overview" class="view active">
+<div class="page-header">
+      <div>
+        <div class="page-title">Welcome back, Greyola</div>
+        <div class="page-sub">Your pipeline is up 7.5% this week · 3 deals need attention</div>
+      </div>
+      <div class="page-actions">
+        <button class="tn-btn">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><polyline points="20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg>
+          Export
+        </button>
+        <button class="tn-btn primary">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Deal
+        </button>
+      </div>
+    </div>
+
+    <!-- KPIs -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">Total Portfolio Value</div>
+        <div class="kpi-value" id="kpi1">$0<span class="cents">.00</span></div>
+        <div class="kpi-footer">
+          <span class="kpi-badge bg-green">▲ +7.5%</span>
+        </div>
+        <svg class="kpi-spark" viewBox="0 0 90 44" preserveAspectRatio="none">
+          <defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4ade80" stop-opacity=".18"/><stop offset="100%" stop-color="#4ade80" stop-opacity="0"/></linearGradient></defs>
+          <path d="M0,38 C10,32 20,28 30,22 C40,16 50,20 60,12 C70,6 80,9 90,4" fill="none" stroke="#4ade80" stroke-width="2"/>
+          <path d="M0,38 C10,32 20,28 30,22 C40,16 50,20 60,12 C70,6 80,9 90,4 L90,44 L0,44 Z" fill="url(#g1)"/>
+        </svg>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">New Customers</div>
+        <div class="kpi-value" id="kpi2">0</div>
+        <div class="kpi-footer">
+          <span class="kpi-badge bg-green">▲ +156 this week</span>
+        </div>
+        <svg class="kpi-spark" viewBox="0 0 90 44" preserveAspectRatio="none" style="opacity:.5">
+          <rect x="5" y="24" width="10" height="20" fill="#4ade80" rx="2"/>
+          <rect x="20" y="14" width="10" height="30" fill="#4ade80" rx="2"/>
+          <rect x="35" y="18" width="10" height="26" fill="#4ade80" rx="2"/>
+          <rect x="50" y="8" width="10" height="36" fill="#4ade80" rx="2"/>
+          <rect x="65" y="10" width="10" height="34" fill="#4ade80" rx="2"/>
+          <rect x="80" y="4" width="10" height="40" fill="#4ade80" rx="2"/>
+        </svg>
+      </div>
+      <div class="kpi-card dark">
+        <div class="kpi-label">Card Payments</div>
+        <div class="kpi-value">$37,201<span class="cents">.00</span></div>
+        <div class="kpi-footer">
+          <span class="kpi-badge bg-red">▼ -11%</span>
+          <div class="kpi-actions">
+            <button class="kpi-action-btn" title="Upload">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+            </button>
+            <button class="kpi-action-btn" title="Download">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
+            </button>
+            <button class="kpi-action-btn" title="Transfer">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Digital Transfers</div>
+        <div class="kpi-value">$4,799<span class="cents">.00</span></div>
+        <div class="kpi-footer">
+          <span class="kpi-badge bg-green">▲ +6%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD GRID -->
+    <div class="dash-grid">
+
+      <!-- LEFT -->
+      <div class="left-col">
+
+        <!-- PORTFOLIO BREAKDOWN + TRANSACTION PERF SIDE BY SIDE -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+
+          <!-- Portfolio Breakdown -->
+          <div class="card">
+            <div class="card-hd">
+              <div>
+                <div class="card-title">Portfolio Breakdown</div>
+              </div>
+              <button class="exp-btn">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+              </button>
+            </div>
+            <div class="pb-list">
+              <div class="pb-item">
+                <div class="pb-icon" style="font-size:13px">₿</div>
+                <div class="pb-info">
+                  <div class="pb-name">Bitcoin</div>
+                  <div class="pb-meta">From Treasury Wallet</div>
+                </div>
+                <div class="pb-right">
+                  <div class="pb-amount">10 BTC</div>
+                  <div class="pb-date">$560,950 USD</div>
+                </div>
+              </div>
+              <div class="pb-item">
+                <div class="pb-icon" style="background:#3b82f6;font-size:11px;letter-spacing:-.5px">TRF</div>
+                <div class="pb-info">
+                  <div class="pb-name">Bank Transfer</div>
+                  <div class="pb-meta">Incoming · Processing</div>
+                </div>
+                <div class="pb-right">
+                  <div class="pb-amount">$3,420.00</div>
+                  <div class="pb-date">Jan 24, 2025</div>
+                </div>
+              </div>
+              <div class="pb-item">
+                <div class="pb-icon" style="background:#8b5cf6;font-size:12px">Ξ</div>
+                <div class="pb-info">
+                  <div class="pb-name">Ethereum</div>
+                  <div class="pb-meta">From Client Account</div>
+                </div>
+                <div class="pb-right">
+                  <div class="pb-amount">3.25 ETH</div>
+                  <div class="pb-date">$8,920 USD</div>
+                </div>
+              </div>
+              <div class="pb-item">
+                <div class="pb-icon" style="background:#6b7280;font-size:11px">CARD</div>
+                <div class="pb-info">
+                  <div class="pb-name">Card Payment</div>
+                  <div class="pb-meta">Via Visa · Completed</div>
+                </div>
+                <div class="pb-right">
+                  <div class="pb-amount" style="color:var(--red)">-$845.00</div>
+                  <div class="pb-date">Jan 24, 2025</div>
+                </div>
+              </div>
+              <div class="pb-item">
+                <div class="pb-icon" style="background:#10b981;font-size:11px">REF</div>
+                <div class="pb-info">
+                  <div class="pb-name">Refund</div>
+                  <div class="pb-meta">Completed</div>
+                </div>
+                <div class="pb-right">
+                  <div class="pb-amount">$120.50</div>
+                  <div class="pb-date">Jan 22, 2025</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Transaction Performance -->
+          <div class="card">
+            <div class="card-hd">
+              <div>
+                <div class="card-title">Transaction Performance</div>
+                <div class="card-sub">Processing activity across channels</div>
+              </div>
+            </div>
+            <div class="perf-row">
+              <div class="perf-left">
+                <div class="perf-name">Card Payments</div>
+                <div class="perf-sub">Jan 20 – 27, 2026</div>
+              </div>
+              <div class="perf-right">
+                <div class="perf-val">$37,201</div>
+                <div class="perf-change neg">▼ -11%</div>
+              </div>
+            </div>
+            <div class="perf-row">
+              <div class="perf-left">
+                <div class="perf-name">Digital Transfers</div>
+                <div class="perf-sub">Jan 20 – 27, 2026</div>
+              </div>
+              <div class="perf-right">
+                <div class="perf-val">$4,799</div>
+                <div class="perf-change pos">▲ +6%</div>
+              </div>
+            </div>
+            <div class="perf-row">
+              <div class="perf-left">
+                <div class="perf-name">Crypto Assets</div>
+                <div class="perf-sub">Treasury wallet</div>
+              </div>
+              <div class="perf-right">
+                <div class="perf-val">$569,870</div>
+                <div class="perf-change pos">▲ +3.2%</div>
+              </div>
+            </div>
+            <div class="perf-row">
+              <div class="perf-left">
+                <div class="perf-name">Refunds Issued</div>
+                <div class="perf-sub">This month</div>
+              </div>
+              <div class="perf-right">
+                <div class="perf-val" style="color:var(--red)">$2,340</div>
+                <div class="perf-change neg">▼ total</div>
+              </div>
+            </div>
+            <div class="perf-row">
+              <div class="perf-left">
+                <div class="perf-name">Processing Fees</div>
+                <div class="perf-sub">Collected</div>
+              </div>
+              <div class="perf-right">
+                <div class="perf-val">$245.00</div>
+                <div class="perf-change" style="color:var(--text-muted)">standard</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- REVENUE CHART -->
+        <div class="card">
+          <div class="card-hd">
+            <div>
+              <div class="card-title">Transaction Volume</div>
+              <div class="card-sub">Jan 1 – Sep 13, 2026</div>
+            </div>
+            <div class="card-hd-right">
+              <div class="chart-legend">
+                <div class="legend-item"><div class="legend-dot" style="background:#0d0d0b"></div>Revenue</div>
+                <div class="legend-item"><div class="legend-dot" style="background:#4ade80"></div>Target</div>
+              </div>
+              <button class="exp-btn">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+              </button>
+            </div>
+          </div>
+          <div class="chart-wrap">
+            <div class="chart-canvas-wrap">
+              <canvas id="revenueChart" height="140" aria-label="Transaction volume bar chart" role="img"></canvas>
+              <div class="chart-tooltip" id="chartTooltip"></div>
+            </div>
+            <div class="chart-months">
+              <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- DEAL PIPELINE -->
+        <div class="card">
+          <div class="card-hd">
+            <div>
+              <div class="card-title">Deal Pipeline</div>
+              <div class="card-sub">Click any row to view details</div>
+            </div>
+            <button class="exp-btn">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+            </button>
+          </div>
+          <div style="overflow-x:auto">
+            <table class="deal-table">
+              <thead>
+                <tr>
+                  <th>Deal</th>
+                  <th>Contact</th>
+                  <th>Stage</th>
+                  <th>Value</th>
+                  <th>Close Date</th>
+                  <th>Win %</th>
+                </tr>
+              </thead>
+              <tbody id="dealTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT -->
+      <div class="right-col">
+
+        <!-- NOTIFICATIONS -->
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">Notifications</div></div>
+          </div>
+          <div style="padding:0 18px 10px;display:flex;gap:4px">
+            <button class="ntab active" onclick="setNotifTab(this)">All</button>
+            <button class="ntab" onclick="setNotifTab(this)">Unread <span style="background:#f43f5e;color:white;border-radius:20px;padding:0 5px;font-size:9px;margin-left:2px">3</span></button>
+          </div>
+          <div class="notif-item">
+            <div class="notif-ico" style="background:#f0fdf4">💳</div>
+            <div class="notif-body">
+              <div class="notif-title">Payment Received</div>
+              <div class="notif-desc">Client Transfer Completed · $3,420.00 credited to Main Balance</div>
+              <div class="notif-time">30m ago</div>
+            </div>
+            <div class="notif-dot"></div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-ico" style="background:#ede9fe">⟠</div>
+            <div class="notif-body">
+              <div class="notif-title">Transaction Flagged</div>
+              <div class="notif-desc">Manual Approval Required · $12,500.00</div>
+              <div class="notif-time">1h ago</div>
+              <div class="notif-btns">
+                <button class="nb" onclick="resolveNotif(this,'decline')">Decline</button>
+                <button class="nb primary" onclick="resolveNotif(this,'accept')">Accept</button>
+              </div>
+            </div>
+            <div class="notif-dot"></div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-ico" style="background:#fff7ed">₿</div>
+            <div class="notif-body">
+              <div class="notif-title">Bitcoin Deposit Received</div>
+              <div class="notif-desc">From Treasury Wallet · 16 BTC</div>
+              <div class="notif-time">1h ago</div>
+            </div>
+            <div class="notif-dot"></div>
+          </div>
+          <div class="notif-item">
+            <div class="notif-ico" style="background:#f1f5f9">🔐</div>
+            <div class="notif-body">
+              <div class="notif-title">Security Notice</div>
+              <div class="notif-desc">New Device Login</div>
+              <div class="notif-time">2h ago</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MESSAGES -->
+        <div class="card">
+          <div class="card-hd">
+            <div><div class="card-title">Messages</div></div>
+            <button class="exp-btn">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+            </button>
+          </div>
+          <div class="msg-search">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9c9c99" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" placeholder="Search messages…"/>
+          </div>
+          <div class="msg-item unread">
+            <div class="msg-av" style="background:#667eea">AM<div class="online"></div></div>
+            <div class="msg-right">
+              <div class="msg-row"><div class="msg-name">@emilyjones</div><div class="msg-time">now</div></div>
+              <div class="msg-preview">Got a rough date for when the coded version of...</div>
+            </div>
+            <div class="msg-unread-badge">2</div>
+          </div>
+          <div class="msg-item unread">
+            <div class="msg-av" style="background:#10b981">RK<div class="online"></div></div>
+            <div class="msg-right">
+              <div class="msg-row"><div class="msg-name">@orvalcasper</div><div class="msg-time">now</div></div>
+              <div class="msg-preview">When do you release the coded version for Fleet...</div>
+            </div>
+            <div class="msg-unread-badge">1</div>
+          </div>
+          <div class="msg-item">
+            <div class="msg-av" style="background:#f59e0b">JL</div>
+            <div class="msg-right">
+              <div class="msg-row"><div class="msg-name">@davidwilson</div><div class="msg-time">1m ago</div></div>
+              <div class="msg-preview">What's the timeline for the coded version of Core D...</div>
+            </div>
+          </div>
+          <div class="msg-item">
+            <div class="msg-av" style="background:#ec4899">LP<div class="online" style="background:#4ade80"></div></div>
+            <div class="msg-right">
+              <div class="msg-row"><div class="msg-name">@laurawhite</div><div class="msg-time">2m ago</div></div>
+              <div class="msg-preview">When's the coded version of Core Dashboard...</div>
+            </div>
+          </div>
+          <div class="msg-item">
+            <div class="msg-av" style="background:#8b5cf6">SP</div>
+            <div class="msg-right">
+              <div class="msg-row"><div class="msg-name">@robertclark</div><div class="msg-time">5m ago</div></div>
+              <div class="msg-preview">When should we expect the coded version of C...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SALES FUNNEL -->
+        <div class="card">
+          <div class="card-hd">
+            <div>
+              <div class="card-title">Sales Funnel</div>
+              <div class="card-sub">Active deals this quarter</div>
+            </div>
+          </div>
+          <div class="funnel-wrap">
+            <div class="f-stage">
+              <div class="f-label">Discovery</div>
+              <div class="f-track"><div class="f-bar" style="width:0;background:#0d0d0b" data-w="100">24</div></div>
+              <div class="f-count">24</div>
+            </div>
+            <div class="f-stage">
+              <div class="f-label">Qualified</div>
+              <div class="f-track"><div class="f-bar" style="width:0;background:#4ade80;color:#0a3d1f" data-w="75">18</div></div>
+              <div class="f-count">18</div>
+            </div>
+            <div class="f-stage">
+              <div class="f-label">Proposal</div>
+              <div class="f-track"><div class="f-bar" style="width:0;background:#60a5fa" data-w="54">13</div></div>
+              <div class="f-count">13</div>
+            </div>
+            <div class="f-stage">
+              <div class="f-label">Negotiation</div>
+              <div class="f-track"><div class="f-bar" style="width:0;background:#a78bfa" data-w="33">8</div></div>
+              <div class="f-count">8</div>
+            </div>
+            <div class="f-stage">
+              <div class="f-label">Closed Won</div>
+              <div class="f-track"><div class="f-bar" style="width:0;background:#34d399" data-w="21">5</div></div>
+              <div class="f-count">5</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TOP CONTACTS -->
+        <div class="card">
+          <div class="card-hd">
+            <div>
+              <div class="card-title">Top Contacts</div>
+              <div class="card-sub">By deal value</div>
+            </div>
+            <button class="exp-btn">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+            </button>
+          </div>
+          <div class="contact-row">
+            <div class="av-wrap"><div class="c-av" style="background:#10b981">RK</div><div class="online"></div></div>
+            <div class="c-info"><div class="c-name">Ravi Khan</div><div class="c-role">CTO · CloudNest</div></div>
+            <div class="c-val">$91k</div>
+          </div>
+          <div class="contact-row">
+            <div class="av-wrap"><div class="c-av" style="background:#667eea">AM</div><div class="online"></div></div>
+            <div class="c-info"><div class="c-name">Ana Martinez</div><div class="c-role">VP Sales · Acme Corp</div></div>
+            <div class="c-val">$48k</div>
+          </div>
+          <div class="contact-row">
+            <div class="av-wrap"><div class="c-av" style="background:#ec4899">LP</div><div class="online"></div></div>
+            <div class="c-info"><div class="c-name">Leila Patel</div><div class="c-role">CFO · Echo Capital</div></div>
+            <div class="c-val">$37k</div>
+          </div>
+          <div class="contact-row">
+            <div class="av-wrap"><div class="c-av" style="background:#f59e0b">JL</div></div>
+            <div class="c-info"><div class="c-name">James Liu</div><div class="c-role">CEO · Beacon Inc.</div></div>
+            <div class="c-val">$22k</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+<!-- CONTACTS VIEW -->
+<section id="view-contacts" class="view">
+  <div class="page-header">
+    <div><div class="page-title">Contacts</div><div class="page-sub">People and accounts across your pipeline</div></div>
+    <div class="page-actions">
+      <button class="tn-btn" onclick="exportContacts()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export
+      </button>
+      <button class="tn-btn primary" onclick="openDealModal()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Deal
+      </button>
+    </div>
+  </div>
+  <div class="contact-grid" id="contactGrid"></div>
+</section>
+
+<!-- DEALS VIEW -->
+<section id="view-deals" class="view">
+  <div class="page-header">
+    <div><div class="page-title">Deals</div><div class="page-sub">Every opportunity in your pipeline</div></div>
+    <div class="page-actions">
+      <button class="tn-btn" onclick="exportDeals()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Export
+      </button>
+      <button class="tn-btn primary" onclick="openDealModal()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        New Deal
+      </button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-hd">
+      <div><div class="card-title">All Deals</div><div class="card-sub" id="dealsCountSub"></div></div>
+      <select class="filter-select" id="dealStageFilter" onchange="renderDealsView()">
+        <option value="">All stages</option>
+        <option>Discovery</option><option>Qualified</option><option>Proposal</option><option>Negotiation</option><option>Closed Won</option>
+      </select>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="deal-table">
+        <thead><tr><th>Deal</th><th>Contact</th><th>Stage</th><th>Value</th><th>Close Date</th><th>Win %</th></tr></thead>
+        <tbody id="dealsViewBody"></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ANALYTICS VIEW -->
+<section id="view-analytics" class="view">
+  <div class="page-header">
+    <div><div class="page-title">Analytics</div><div class="page-sub">Pipeline health and performance</div></div>
+  </div>
+  <div class="kpi-grid">
+    <div class="kpi-card"><div class="kpi-label">Total Pipeline</div><div class="kpi-value" id="anTotal">$0</div></div>
+    <div class="kpi-card"><div class="kpi-label">Weighted Pipeline</div><div class="kpi-value" id="anWeighted">$0</div></div>
+    <div class="kpi-card dark"><div class="kpi-label">Avg Win Probability</div><div class="kpi-value" id="anAvg">0%</div></div>
+    <div class="kpi-card"><div class="kpi-label">Open Deals</div><div class="kpi-value" id="anCount">0</div></div>
+  </div>
+  <div class="dash-grid">
+    <div class="left-col">
+      <div class="card">
+        <div class="card-hd"><div><div class="card-title">Sales Funnel</div><div class="card-sub">Active deals this quarter</div></div></div>
+        <div class="funnel-wrap">
+          <div class="f-stage"><div class="f-label">Discovery</div><div class="f-track"><div class="f-bar" style="width:0;background:#0d0d0b" data-w="100">24</div></div><div class="f-count">24</div></div>
+          <div class="f-stage"><div class="f-label">Qualified</div><div class="f-track"><div class="f-bar" style="width:0;background:#4ade80;color:#0a3d1f" data-w="75">18</div></div><div class="f-count">18</div></div>
+          <div class="f-stage"><div class="f-label">Proposal</div><div class="f-track"><div class="f-bar" style="width:0;background:#60a5fa" data-w="54">13</div></div><div class="f-count">13</div></div>
+          <div class="f-stage"><div class="f-label">Negotiation</div><div class="f-track"><div class="f-bar" style="width:0;background:#a78bfa" data-w="33">8</div></div><div class="f-count">8</div></div>
+          <div class="f-stage"><div class="f-label">Closed Won</div><div class="f-track"><div class="f-bar" style="width:0;background:#34d399" data-w="21">5</div></div><div class="f-count">5</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="right-col">
+      <div class="card">
+        <div class="card-hd"><div><div class="card-title">Transaction Performance</div><div class="card-sub">Processing activity across channels</div></div></div>
+        <div class="perf-row"><div class="perf-left"><div class="perf-name">Card Payments</div><div class="perf-sub">Jan 20 – 27, 2026</div></div><div class="perf-right"><div class="perf-val">$37,201</div><div class="perf-change neg">▼ -11%</div></div></div>
+        <div class="perf-row"><div class="perf-left"><div class="perf-name">Digital Transfers</div><div class="perf-sub">Jan 20 – 27, 2026</div></div><div class="perf-right"><div class="perf-val">$4,799</div><div class="perf-change pos">▲ +6%</div></div></div>
+        <div class="perf-row"><div class="perf-left"><div class="perf-name">Crypto Assets</div><div class="perf-sub">Treasury wallet</div></div><div class="perf-right"><div class="perf-val">$569,870</div><div class="perf-change pos">▲ +3.2%</div></div></div>
+        <div class="perf-row"><div class="perf-left"><div class="perf-name">Refunds Issued</div><div class="perf-sub">This month</div></div><div class="perf-right"><div class="perf-val" style="color:var(--red)">$2,340</div><div class="perf-change neg">▼ total</div></div></div>
+        <div class="perf-row"><div class="perf-left"><div class="perf-name">Processing Fees</div><div class="perf-sub">Collected</div></div><div class="perf-right"><div class="perf-val">$245.00</div><div class="perf-change" style="color:var(--text-muted)">standard</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MESSAGES VIEW -->
+<section id="view-messages" class="view">
+  <div class="msg-layout">
+    <div class="msg-list-card card">
+      <div class="card-hd"><div><div class="card-title">Conversations</div></div></div>
+      <div class="msg-search">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9c9c99" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="msgSearch" placeholder="Search conversations…" oninput="renderConversations()"/>
+      </div>
+      <div id="conversationList"></div>
+    </div>
+    <div class="msg-thread-card card">
+      <div class="empty-state" id="threadEmpty">Select a conversation to view messages</div>
+      <div id="threadView" style="display:none;flex-direction:column;flex:1;min-height:0">
+        <div class="panel-hd" style="position:static">
+          <div class="msg-av" id="threadAv" style="width:38px;height:38px;font-size:12px"></div>
+          <div><div id="threadName" style="font-size:16px;font-weight:800"></div><div id="threadHandle" style="font-size:11px;color:var(--text-muted)"></div></div>
+        </div>
+        <div class="thread-body" id="threadBody"></div>
+        <div class="compose">
+          <input id="msgInput" placeholder="Type a message…" onkeydown="if(event.key==='Enter')sendMessage()"/>
+          <button class="p-btn primary" style="flex:0 0 auto;padding:10px 16px" onclick="sendMessage()">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CALENDAR VIEW -->
+<section id="view-calendar" class="view">
+  <div class="page-header">
+    <div><div class="page-title">Calendar</div><div class="page-sub">Deal close dates and upcoming milestones</div></div>
+    <div class="page-actions">
+      <button class="tn-btn" onclick="goToday()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><line x1="12" y1="7" x2="12" y2="12"/><line x1="9" y1="12" x2="14" y2="12"/></svg>
+        Today
+      </button>
+      <button class="tn-btn primary" onclick="showView('deals')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        View Deals
+      </button>
+    </div>
+  </div>
+  <div class="cal-wrap">
+    <div class="card cal-grid-card">
+      <div class="cal-top">
+        <div class="cal-nav">
+          <button onclick="calShift(-1)" title="Previous month"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <div class="cal-month" id="calMonth">—</div>
+          <button onclick="calShift(1)" title="Next month"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></button>
+        </div>
+      </div>
+      <div class="cal-weekdays"><div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div></div>
+      <div class="cal-days" id="calDays"></div>
+    </div>
+    <div class="right-col">
+      <div class="card cal-side-card">
+        <div class="card-hd"><div><div class="card-title" id="calSideTitle">Upcoming</div><div class="card-sub" id="calSideSub">Next 5 closings</div></div></div>
+        <div class="pb-list" id="calSideList"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SETTINGS VIEW -->
+<section id="view-settings" class="view">
+  <div class="page-header">
+    <div><div class="page-title">Settings</div><div class="page-sub">Profile, appearance, and data</div></div>
+  </div>
+  <div class="settings-grid">
+    <div class="card set-card">
+      <div class="card-hd"><div><div class="card-title">Profile</div></div></div>
+      <div class="card-body" style="padding:18px">
+        <div class="set-profile">
+          <div class="av" id="setProfileAv">G</div>
+          <div><div style="font-size:15px;font-weight:800" id="setProfileName">Greyola</div><div style="font-size:11.5px;color:var(--text-muted)" id="setProfileRole">Your workspace</div></div>
+        </div>
+        <div class="set-field"><label>Full name</label><input class="set-input" id="setName" placeholder="Your name"/></div>
+        <div class="set-field"><label>Company</label><input class="set-input" id="setCompany" placeholder="Company"/></div>
+        <div class="set-field"><label>Email</label><input class="set-input" id="setEmail" placeholder="you@company.com"/></div>
+        <div class="set-field"><label>Role / Title</label><input class="set-input" id="setRole" placeholder="e.g. Account Executive"/></div>
+        <button class="p-btn primary" style="width:100%" onclick="saveProfile()">Save Profile</button>
+      </div>
+    </div>
+    <div class="card set-card">
+      <div class="card-hd"><div><div class="card-title">Appearance</div></div></div>
+      <div class="card-body" style="padding:18px">
+        <div class="set-row">
+          <div><div class="sr-label">Reduce motion</div><div class="sr-sub">Disable entrance animations</div></div>
+          <label class="switch"><input type="checkbox" id="setReduceMotion" onchange="applySetting('reduceMotion',this.checked)"/><span class="track"></span><span class="knob"></span></label>
+        </div>
+        <div class="set-row">
+          <div><div class="sr-label">Compact density</div><div class="sr-sub">Tighter spacing</div></div>
+          <label class="switch"><input type="checkbox" id="setCompact" onchange="applySetting('compact',this.checked)"/><span class="track"></span><span class="knob"></span></label>
+        </div>
+        <div class="set-row" style="display:block">
+          <div style="margin-bottom:10px"><div class="sr-label">Accent color</div><div class="sr-sub">Used for highlights &amp; status</div></div>
+          <div class="accent-row" id="accentRow"></div>
+        </div>
+        <div class="set-row">
+          <div><div class="sr-label">Landing view</div><div class="sr-sub">Open this on launch</div></div>
+          <select class="set-input" style="width:auto" id="setLanding" onchange="applySetting('landing',this.value)">
+            <option value="overview">Overview</option><option value="calendar">Calendar</option><option value="deals">Deals</option><option value="contacts">Contacts</option><option value="analytics">Analytics</option><option value="messages">Messages</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="card set-card">
+      <div class="card-hd"><div><div class="card-title">Data</div></div></div>
+      <div class="card-body" style="padding:18px">
+        <div class="set-row" style="border-bottom:none;padding-bottom:14px">
+          <div><div class="sr-label">Export everything</div><div class="sr-sub">Download deals &amp; contacts as CSV</div></div>
+          <button class="tn-btn" onclick="exportDeals();exportContacts()">Export</button>
+        </div>
+        <div class="set-row" style="border-bottom:none">
+          <div><div class="sr-label" style="color:var(--red)">Clear all data</div><div class="sr-sub">Removes deals, messages &amp; settings</div></div>
+          <button class="tn-btn danger-btn" onclick="clearAllData()">Clear</button>
+        </div>
+      </div>
+    </div>
+    <div class="card set-card">
+      <div class="card-hd"><div><div class="card-title">About</div></div></div>
+      <div class="card-body" style="padding:18px">
+        <div class="about-row"><span>App</span><span>Greyola CRM</span></div>
+        <div class="about-row"><span>Version</span><span>1.1</span></div>
+        <div class="about-row"><span>Platform</span><span>Windows · WebView2</span></div>
+        <div class="about-row"><span>Storage</span><span id="aboutStorage">Local</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+</div>
+
+<script>
+
+// ── PERSISTENCE ──
+const store={get(k,d){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):d;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+function parseVal(v){const n=String(v).replace(/[^0-9.]/g,'');return parseFloat(n)||0;}
+function totalPipeline(){try{return (typeof deals!=='undefined'?deals:[]).reduce(function(s,d){return s+parseVal(d.value);},0);}catch(e){return 0;}}
+function loadDeals(def){const s=store.get('greyola_deals',null);return Array.isArray(s)?s:def;}
+// ── DATA ──
+let deals = loadDeals([
+  {name:'CloudNest Enterprise',company:'CloudNest Ltd.',contact:'Ravi Khan',initials:'RK',color:'#10b981',stage:'Qualified',stageClass:'s-qual',value:'$91,200',prob:70,close:'Jul 15, 2026',timeline:[{title:'Demo scheduled',time:'Jun 5'},{title:'Technical review passed',time:'May 28'},{title:'Initial call',time:'May 10'}]},
+  {name:'Acme Corp Renewal',company:'Acme Corporation',contact:'Ana Martinez',initials:'AM',color:'#667eea',stage:'Negotiation',stageClass:'s-neg',value:'$48,000',prob:82,close:'Jun 30, 2026',timeline:[{title:'Contract draft sent',time:'Jun 7'},{title:'Pricing approved internally',time:'Jun 1'},{title:'Renewal discussion started',time:'May 20'}]},
+  {name:'Echo Ventures',company:'Echo Capital',contact:'Leila Patel',initials:'LP',color:'#ec4899',stage:'Closed Won',stageClass:'s-closed',value:'$37,201',prob:100,close:'Jun 1, 2026',timeline:[{title:'Contract signed',time:'Jun 1'},{title:'Final proposal accepted',time:'May 29'},{title:'Negotiation complete',time:'May 25'}]},
+  {name:'Beacon Software',company:'Beacon Inc.',contact:'James Liu',initials:'JL',color:'#f59e0b',stage:'Proposal',stageClass:'s-prop',value:'$22,500',prob:55,close:'Aug 1, 2026',timeline:[{title:'Proposal sent',time:'Jun 6'},{title:'Discovery call complete',time:'May 30'},{title:'Lead qualified',time:'May 15'}]},
+  {name:'Delta Logistics',company:'Delta Group',contact:'Sarah Park',initials:'SP',color:'#8b5cf6',stage:'Discovery',stageClass:'s-disc',value:'$15,800',prob:30,close:'Sep 1, 2026',timeline:[{title:'First call booked',time:'Jun 8'},{title:'Inbound lead received',time:'Jun 3'}]},
+]);
+
+// ── RENDER DEALS TABLE ──
+const tbody = document.getElementById('dealTableBody');
+deals.forEach((d,i) => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><div class="deal-name">${d.name}</div><div class="deal-co">${d.company}</div></td>
+    <td><div class="chip"><div class="mav" style="background:${d.color}">${d.initials}</div>${d.contact}</div></td>
+    <td><span class="stage-pill ${d.stageClass}">${d.stage}</span></td>
+    <td><div class="deal-val">${d.value}</div></td>
+    <td style="font-size:12px;color:var(--text-secondary)">${d.close}</td>
+    <td>
+      <div class="prob-wrap">
+        <div class="prob-lbl">${d.prob}%</div>
+        <div class="prob-track"><div class="prob-fill" style="width:${d.prob}%"></div></div>
+      </div>
+    </td>`;
+  tr.style.cursor = 'pointer';
+  tr.addEventListener('click', () => openPanel(d));
+  tbody.appendChild(tr);
+});
+
+// ── PANEL ──
+function openPanel(d) {
+  document.getElementById('panelTitle').textContent = d.name;
+  document.getElementById('panelCompany').textContent = d.company;
+  document.getElementById('panelValue').textContent = d.value;
+  document.getElementById('panelProb').textContent = d.prob + '%';
+  document.getElementById('panelClose').textContent = d.close;
+  document.getElementById('panelOwner').textContent = d.contact;
+  document.getElementById('panelStage').innerHTML = `<span class="stage-pill ${d.stageClass}">${d.stage}</span>`;
+  // Fix 5: populate badge row
+  document.getElementById('panelBadges').innerHTML = `
+    <span class="stage-pill ${d.stageClass}">${d.stage}</span>
+    <span class="kpi-badge ${d.prob >= 70 ? 'bg-green' : d.prob >= 40 ? 'bg-green' : 'bg-red'}" style="font-size:11px">${d.prob}% win probability</span>
+  `;
+  const tl = document.getElementById('panelTimeline');
+  tl.innerHTML = d.timeline.map(t => `
+    <div class="tl-item">
+      <div class="tl-dot"></div>
+      <div><div class="tl-title">${t.title}</div><div class="tl-time">${t.time}</div></div>
+    </div>`).join('');
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('sidePanel').classList.add('open');
+}
+function closePanel() {
+  document.getElementById('overlay').classList.remove('open');
+  document.getElementById('sidePanel').classList.remove('open');
+}
+
+// ── KPI COUNTER ──
+function animateCount(elId, target, prefix, hasCents) {
+  const el = document.getElementById(elId);
+  const dur = 1200, steps = 60, inc = target / steps;
+  let cur = 0, step = 0;
+  const suffix = hasCents ? '<span class="cents">' + (target % 1 === 0 ? '.00' : ('.' + (target.toFixed(2).split('.')[1]))) + '</span>' : '';
+  const t = setInterval(() => {
+    cur = Math.min(cur + inc, target);
+    step++;
+    const whole = Math.floor(cur).toLocaleString('en-US');
+    el.innerHTML = prefix + whole + (hasCents && step < steps ? '' : suffix);
+    if (step >= steps) {
+      el.innerHTML = prefix + Math.floor(target).toLocaleString('en-US') + suffix;
+      clearInterval(t);
+    }
+  }, dur / steps);
+}
+setTimeout(() => {
+  animateCount('kpi1', 9567, '$', true);
+  animateCount('kpi2', 21120, '', false);
+}, 300);
+
+// ── CHART ──
+(function() {
+  const canvas = document.getElementById('revenueChart');
+  const tooltip = document.getElementById('chartTooltip');
+  const data = [28000, 34000, 41000, 38000, 52000, 37201, 61000, 55000, 48000];
+  const targets = [30000, 35000, 40000, 42000, 48000, 50000, 58000, 60000, 55000];
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep'];
+  let hoveredBar = -1;
+
+  // Fix 4: polyfill ctx.roundRect for older browsers
+  function roundRect(ctx, x, y, w, h, r) {
+    if (ctx.roundRect) {
+      ctx.beginPath(); ctx.roundRect(x, y, w, h, r); ctx.fill();
+    } else {
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.lineTo(x + w - r, y); ctx.arcTo(x+w, y, x+w, y+r, r);
+      ctx.lineTo(x + w, y + h - r); ctx.arcTo(x+w, y+h, x+w-r, y+h, r);
+      ctx.lineTo(x + r, y + h); ctx.arcTo(x, y+h, x, y+h-r, r);
+      ctx.lineTo(x, y + r); ctx.arcTo(x, y, x+r, y, r);
+      ctx.closePath(); ctx.fill();
+    }
+  }
+
+  // Fix 3: single source of truth for layout constants
+  const PAD = {l:4, r:4, t:10, b:8};
+  function getLayout() {
+    const W = canvas.offsetWidth, H = 140;
+    const chartW = W - PAD.l - PAD.r, chartH = H - PAD.t - PAD.b;
+    const n = data.length;
+    const gap = chartW / n;
+    const bW = Math.floor(gap * 0.48);
+    return { W, H, chartW, chartH, n, gap, bW };
+  }
+
+  function draw() {
+    const { W, H, chartW, chartH, n, gap, bW } = getLayout();
+    canvas.width = W * devicePixelRatio; canvas.height = H * devicePixelRatio;
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    const ctx = canvas.getContext('2d'); ctx.scale(devicePixelRatio, devicePixelRatio);
+    const max = 70000;
+
+    // grid lines
+    [0.25,0.5,0.75,1].forEach(f => {
+      const y = PAD.t + chartH - chartH * f;
+      ctx.strokeStyle = '#e6e6e3'; ctx.lineWidth = 1; ctx.setLineDash([]);
+      ctx.beginPath(); ctx.moveTo(PAD.l, y); ctx.lineTo(PAD.l + chartW, y); ctx.stroke();
+    });
+
+    // bars
+    data.forEach((v, i) => {
+      const x = PAD.l + i * gap + (gap - bW) / 2;
+      const h = (v / max) * chartH;
+      const y = PAD.t + chartH - h;
+      const isHov = i === hoveredBar;
+      const isGreen = i === 5 || i === 6;
+      const isPeak = i === 6;
+      ctx.fillStyle = isHov
+        ? (isGreen ? '#22c55e' : '#444')
+        : (isPeak ? '#0d0d0b' : isGreen ? '#4ade80' : '#e6e6e3');
+      roundRect(ctx, x, y, bW, h, 3);
+
+      // pinned label on bar index 5
+      if (i === 5) {
+        const tx = x + bW / 2;
+        const ty = y - 28;
+        // tooltip box
+        if (ctx.roundRect) {
+          ctx.fillStyle = '#0d0d0b';
+          ctx.beginPath(); ctx.roundRect(tx - 40, ty, 80, 22, 11); ctx.fill();
+        } else {
+          ctx.fillStyle = '#0d0d0b';
+          roundRect(ctx, tx - 40, ty, 80, 22, 11);
+        }
+        ctx.fillStyle = '#fff';
+        ctx.font = `700 10px 'Plus Jakarta Sans',sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillText('$37,201.00', tx, ty + 14);
+        // fee badge
+        ctx.fillStyle = '#e6e6e3';
+        roundRect(ctx, tx - 40, PAD.t + chartH - 14, 80, 13, 6);
+        ctx.fillStyle = '#9c9c99';
+        ctx.font = `600 9px 'Plus Jakarta Sans',sans-serif`;
+        ctx.fillText('Fees: $245.00', tx, PAD.t + chartH - 4);
+      }
+    });
+
+    // dashed target line
+    ctx.strokeStyle = '#4ade80'; ctx.lineWidth = 1.5; ctx.setLineDash([5,4]);
+    ctx.beginPath();
+    targets.forEach((v, i) => {
+      const x = PAD.l + i * gap + gap / 2;
+      const y = PAD.t + chartH - (v / max) * chartH;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.stroke(); ctx.setLineDash([]);
+  }
+
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const { W, gap, n } = getLayout(); // Fix 3: same gap as draw()
+    const idx = Math.floor((mx - PAD.l) / gap);
+    if (idx >= 0 && idx < n) {
+      hoveredBar = idx;
+      tooltip.style.opacity = '1';
+      tooltip.textContent = months[idx] + ': $' + data[idx].toLocaleString();
+      const bx = PAD.l + idx * gap + gap / 2;
+      tooltip.style.left = Math.max(0, Math.min(bx - 50, W - 130)) + 'px';
+      tooltip.style.top = '8px';
+    } else {
+      hoveredBar = -1;
+      tooltip.style.opacity = '0';
+    }
+    draw();
+  });
+
+  canvas.addEventListener('mouseleave', () => {
+    hoveredBar = -1; tooltip.style.opacity = '0'; draw();
+  });
+
+  draw();
+  window.charts = window.charts || {};
+  window.charts['revenueChart'] = draw;
+  window.addEventListener('resize', draw);
+})();
+
+// ── FUNNEL ANIMATE ── Fix 8: use double-rAF to guarantee paint before transition
+requestAnimationFrame(() => {
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.f-bar').forEach(b => { b.style.width = b.dataset.w + '%'; });
+  });
+});
+
+// ── TABS ──
+document.querySelectorAll('.nav-tab').forEach(t => {
+  t.addEventListener('click', () => { document.querySelectorAll('.nav-tab').forEach(x => x.classList.remove('active')); t.classList.add('active'); });
+});
+document.querySelectorAll('.s-icon').forEach(t => {
+  t.addEventListener('click', () => { document.querySelectorAll('.s-icon').forEach(x => x.classList.remove('active')); t.classList.add('active'); });
+});
+// Fix 7: removed unused `tab` parameter
+function setNotifTab(el) {
+  document.querySelectorAll('.ntab').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+  const unread = el.textContent.indexOf('Unread') >= 0;
+  document.querySelectorAll('.notif-item').forEach(it => { if (unread) it.classList.toggle('hide', it.classList.contains('read')); else it.classList.remove('hide'); });
+}
+
+// ── MOBILE NAV ──
+function mobileNav(el) {
+  const label = el.querySelector('.mn-label').textContent.trim();
+  const map = {Overview:'overview',Contacts:'contacts',Deals:'deals',Messages:'messages',Analytics:'analytics',Calendar:'calendar',Settings:'settings'};
+  if (map[label]) showView(map[label]);
+  document.querySelectorAll('.mn-item').forEach(x => x.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ── CHART TOUCH SUPPORT ──
+(function() {
+  const canvas = document.getElementById('revenueChart');
+  if (!canvas) return;
+  canvas.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const rect = canvas.getBoundingClientRect();
+    canvas.dispatchEvent(new MouseEvent('mousemove', {
+      clientX: touch.clientX,
+      clientY: touch.clientY
+    }));
+  }, { passive: false });
+  canvas.addEventListener('touchend', () => {
+    canvas.dispatchEvent(new MouseEvent('mouseleave'));
+  });
+})();
+</script>
+
+<!-- CONTACT DETAIL PANEL -->
+<div class="panel-overlay" id="contactOverlay" onclick="closeContactPanel()"></div>
+<div class="side-panel" id="contactPanel">
+  <div class="panel-hd">
+    <div class="av-wrap"><div class="c-av" id="contactPanelAv" style="width:46px;height:46px;font-size:16px"></div></div>
+    <div><div id="contactPanelName" style="font-size:18px;font-weight:800;letter-spacing:-.4px"></div><div id="contactPanelRole" style="font-size:11.5px;color:var(--text-muted);margin-top:2px"></div></div>
+    <button class="panel-close" onclick="closeContactPanel()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+  </div>
+  <div class="panel-body" id="contactPanelBody"></div>
+</div>
+
+<!-- NEW DEAL MODAL -->
+<div class="modal-overlay" id="dealModal" onclick="if(event.target===this)closeDealModal()">
+  <div class="modal">
+    <div class="modal-hd"><div class="card-title">New Deal</div><button class="panel-close" onclick="closeDealModal()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
+    <form class="modal-body" id="dealForm" onsubmit="return submitDeal(event)">
+      <label>Deal name<input name="name" required placeholder="e.g. Acme Expansion"/></label>
+      <label>Company<input name="company" required placeholder="e.g. Acme Corp"/></label>
+      <label>Contact name<input name="contact" required placeholder="e.g. Ana Martinez"/></label>
+      <div class="row">
+        <label>Stage<select name="stage"><option>Discovery</option><option>Qualified</option><option>Proposal</option><option>Negotiation</option><option>Closed Won</option></select></label>
+        <label>Value (USD)<input name="value" type="number" min="0" required placeholder="50000"/></label>
+      </div>
+      <div class="row">
+        <label>Win probability (%)<input name="prob" type="number" min="0" max="100" value="50"/></label>
+        <label>Close date<input name="close" type="date"/></label>
+      </div>
+      <div class="modal-ft"><button type="button" class="p-btn" onclick="closeDealModal()">Cancel</button><button type="submit" class="p-btn primary">Create Deal</button></div>
+    </form>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+// ── ENHANCEMENTS: navigation, contacts, messages, deals, modal, persistence ──
+var ROLE={'Ravi Khan':'CTO · CloudNest','Ana Martinez':'VP Sales · Acme Corp','Leila Patel':'CFO · Echo Capital','James Liu':'CEO · Beacon Inc.','Sarah Park':'Procurement · Delta Group'};
+var PALETTE=['#10b981','#667eea','#ec4899','#f59e0b','#8b5cf6','#0ea5e9','#ef4444','#14b8a6'];
+function pickColor(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))>>>0;return PALETTE[h%PALETTE.length];}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function initialsOf(name){return name.split(/\s+/).map(function(w){return w.charAt(0);}).join('').slice(0,2).toUpperCase();}
+
+var SIDEBAR_VIEW={Overview:'overview',Contacts:'contacts',Deals:'deals',Analytics:'analytics',Messages:'messages',Calendar:'calendar',Settings:'settings'};
+var NAV_VIEW={Overview:'overview',Customers:'contacts',Pipeline:'deals',Analytics:'analytics',Activity:'messages'};
+var MOBILE_VIEW={Overview:'overview',Contacts:'contacts',Deals:'deals',Messages:'messages',Analytics:'analytics',Calendar:'calendar',Settings:'settings'};
+
+// ── conversations ──
+var DEFAULT_CONVERSATIONS=[
+  {handle:'@emilyjones',name:'Emily Jones',color:'#667eea',online:true,unread:2,time:'now',preview:'Got a rough date for when the coded version of...',
+   thread:[{from:'them',text:'Hey! Got a rough date for when the coded version of the dashboard ships?',time:'9:02'},{from:'me',text:'Aiming for end of the month — I will confirm with engineering.',time:'9:05'},{from:'them',text:'Perfect, keep me posted 🙏',time:'9:06'}]},
+  {handle:'@orvalcasper',name:'Orval Casper',color:'#10b981',online:true,unread:1,time:'now',preview:'When do you release the coded version for Fleet...',
+   thread:[{from:'them',text:'When do you release the coded version for Fleet Operations?',time:'8:51'},{from:'me',text:'Fleet is queued right after Core. Early next month.',time:'8:55'}]},
+  {handle:'@davidwilson',name:'David Wilson',color:'#f59e0b',online:false,unread:0,time:'1m ago',preview:'What is the timeline for the coded version of Core D...',
+   thread:[{from:'them',text:'What is the timeline for the coded version of Core Dashboard?',time:'8:40'},{from:'me',text:'Core Dashboard coded build lands this week.',time:'8:44'}]},
+  {handle:'@laurawhite',name:'Laura White',color:'#ec4899',online:true,unread:0,time:'2m ago',preview:'When is the coded version of Core Dashboard...',
+   thread:[{from:'them',text:'When is the coded version of Core Dashboard going live?',time:'8:30'},{from:'me',text:'Same window as Core — this week.',time:'8:33'}]},
+  {handle:'@robertclark',name:'Robert Clark',color:'#8b5cf6',online:false,unread:0,time:'5m ago',preview:'When should we expect the coded version of C...',
+   thread:[{from:'them',text:'When should we expect the coded version of Core?',time:'8:10'},{from:'me',text:'Locking the date today, will share.',time:'8:15'}]}
+];
+var conversations=loadConversations();
+function loadConversations(){var s=store.get('greyola_conversations',null);return Array.isArray(s)?s:DEFAULT_CONVERSATIONS;}
+function saveConversations(){store.set('greyola_conversations',conversations);}
+
+// ── toast ──
+function toast(msg){var w=document.getElementById('toastWrap');if(!w)return;var t=document.createElement('div');t.className='toast';t.textContent=msg;w.appendChild(t);setTimeout(function(){t.style.opacity='0';setTimeout(function(){if(t.parentNode)t.parentNode.removeChild(t);},300);},2200);}
+
+// ── view switching ──
+function setActive(view){
+  document.querySelectorAll('.s-icon').forEach(function(el){el.classList.toggle('active',SIDEBAR_VIEW[el.title]===view);});
+  document.querySelectorAll('.nav-tab').forEach(function(el){el.classList.toggle('active',NAV_VIEW[el.textContent.trim()]===view);});
+  document.querySelectorAll('.mn-item').forEach(function(el){var l=el.querySelector('.mn-label').textContent.trim();el.classList.toggle('active',MOBILE_VIEW[l]===view);});
+}
+function showView(name){
+  if(['overview','contacts','deals','analytics','messages','calendar','settings'].indexOf(name)<0)return;
+  document.querySelectorAll('.view').forEach(function(v){v.classList.toggle('active',v.id==='view-'+name);});
+  setActive(name);
+  var bc=document.getElementById('breadcrumbCurrent');
+  if(bc)bc.textContent={overview:'Dashboard',contacts:'Contacts',deals:'Deals',analytics:'Analytics',messages:'Messages',calendar:'Calendar',settings:'Settings'}[name];
+  if(name==='contacts')renderContacts();
+  if(name==='deals')renderDealsView();
+  if(name==='messages')renderConversations();
+  if(name==='analytics')renderAnalytics();
+  if(name==='calendar')renderCalendar();
+  if(name==='settings')renderSettings();
+  if(name==='overview'){if(window.charts&&window.charts['revenueChart'])window.charts['revenueChart']();}
+  window.scrollTo(0,0);
+}
+
+// ── deals ──
+function dealRow(d){
+  var tr=document.createElement('tr');
+  tr.innerHTML='<td><div class="deal-name">'+escapeHtml(d.name)+'</div><div class="deal-co">'+escapeHtml(d.company)+'</div></td>'+
+    '<td><div class="chip"><div class="mav" style="background:'+d.color+'">'+d.initials+'</div>'+escapeHtml(d.contact)+'</div></td>'+
+    '<td><span class="stage-pill '+d.stageClass+'">'+escapeHtml(d.stage)+'</span></td>'+
+    '<td><div class="deal-val">'+escapeHtml(d.value)+'</div></td>'+
+    '<td style="font-size:12px;color:var(--text-secondary)">'+escapeHtml(d.close)+'</td>'+
+    '<td><div class="prob-wrap"><div class="prob-lbl">'+d.prob+'%</div><div class="prob-track"><div class="prob-fill" style="width:'+d.prob+'%"></div></div></div></td>';
+  tr.addEventListener('click',function(){openPanel(d);});
+  return tr;
+}
+function renderDealsView(){
+  var f=document.getElementById('dealStageFilter');var fv=f?f.value:'';
+  var vb=document.getElementById('dealsViewBody');if(!vb)return;
+  vb.innerHTML='';
+  var list=deals.filter(function(d){return !fv||d.stage===fv;});
+  list.forEach(function(d){vb.appendChild(dealRow(d));});
+  var sub=document.getElementById('dealsCountSub');if(sub)sub.textContent=list.length+' deal'+(list.length!==1?'s':'')+(fv?' · '+fv:'');
+}
+function renderAllDeals(){
+  var ob=document.getElementById('dealTableBody');if(ob){ob.innerHTML='';deals.forEach(function(d){ob.appendChild(dealRow(d));});}
+  renderDealsView();
+}
+function updateKpi(){var el=document.getElementById('kpi1');if(el)animateCount('kpi1',totalPipeline(),'$',true);}
+
+// ── contacts ──
+function getContacts(){
+  var m={};
+  deals.forEach(function(d){
+    if(!m[d.contact])m[d.contact]={name:d.contact,initials:d.initials,color:d.color,company:d.company,role:ROLE[d.contact]||d.company,value:0,count:0,deals:[]};
+    var c=m[d.contact];c.value+=parseVal(d.value);c.count++;c.deals.push(d);
+  });
+  return Object.keys(m).map(function(k){return m[k];}).sort(function(a,b){return b.value-a.value;});
+}
+function renderContacts(){
+  var g=document.getElementById('contactGrid');if(!g)return;g.innerHTML='';
+  getContacts().forEach(function(c){
+    var card=document.createElement('div');card.className='contact-card';
+    card.innerHTML='<div class="cc-top"><div class="cc-av" style="background:'+c.color+'">'+c.initials+'</div><div><div class="cc-name">'+escapeHtml(c.name)+'</div><div class="cc-role">'+escapeHtml(c.role)+'</div></div></div>'+
+      '<div class="cc-value">$'+c.value.toLocaleString('en-US')+' · '+c.count+' deal'+(c.count>1?'s':'')+'</div>'+
+      '<div class="cc-meta"><span class="cc-chip">'+escapeHtml(c.company)+'</span><span class="cc-chip">'+c.count+' active</span></div>';
+    card.addEventListener('click',function(){openContactPanel(c);});
+    g.appendChild(card);
+  });
+}
+function openContactPanel(c){
+  document.getElementById('contactPanelAv').style.background=c.color;
+  document.getElementById('contactPanelAv').textContent=c.initials;
+  document.getElementById('contactPanelName').textContent=c.name;
+  document.getElementById('contactPanelRole').textContent=c.role+' · '+c.company;
+  var body=document.getElementById('contactPanelBody');
+  var html='<div class="panel-section"><div class="panel-section-title">Summary</div>'+
+    '<div class="panel-field"><div class="panel-field-label">Total Deal Value</div><div class="panel-field-val big">$'+c.value.toLocaleString('en-US')+'</div></div>'+
+    '<div class="panel-field"><div class="panel-field-label">Active Deals</div><div class="panel-field-val">'+c.count+'</div></div></div>'+
+    '<div class="panel-section"><div class="panel-section-title">Deals</div>';
+  c.deals.forEach(function(d){
+    html+='<div class="pb-item"><div class="pb-icon" style="background:'+d.color+'">'+d.initials+'</div><div class="pb-info"><div class="pb-name">'+escapeHtml(d.name)+'</div><div class="pb-meta">'+escapeHtml(d.stage)+'</div></div><div class="pb-right"><div class="pb-amount">'+escapeHtml(d.value)+'</div></div></div>';
+  });
+  html+='</div>';
+  body.innerHTML=html;
+  body.querySelectorAll('.pb-item').forEach(function(el,i){el.addEventListener('click',function(){openPanel(c.deals[i]);});});
+  document.getElementById('contactOverlay').classList.add('open');
+  document.getElementById('contactPanel').classList.add('open');
+}
+function closeContactPanel(){document.getElementById('contactOverlay').classList.remove('open');document.getElementById('contactPanel').classList.remove('open');}
+
+// ── analytics ──
+function renderAnalytics(){
+  var total=deals.reduce(function(s,d){return s+parseVal(d.value);},0);
+  var weighted=deals.reduce(function(s,d){return s+parseVal(d.value)*d.prob/100;},0);
+  var avg=deals.length?Math.round(deals.reduce(function(s,d){return s+d.prob;},0)/deals.length):0;
+  var open=deals.filter(function(d){return d.stage!=='Closed Won';}).length;
+  var set=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+  set('anTotal','$'+Math.round(total).toLocaleString('en-US'));
+  set('anWeighted','$'+Math.round(weighted).toLocaleString('en-US'));
+  set('anAvg',avg+'%');
+  set('anCount',open);
+}
+
+// ── messages ──
+var activeConv=null;
+function renderConversations(){
+  var list=document.getElementById('conversationList');if(!list)return;
+  var q=(document.getElementById('msgSearch').value||'').toLowerCase();
+  list.innerHTML='';
+  conversations.filter(function(c){return !q||c.name.toLowerCase().indexOf(q)>=0||c.handle.toLowerCase().indexOf(q)>=0;}).forEach(function(c){
+    var it=document.createElement('div');it.className='conversation-item'+(activeConv&&activeConv.handle===c.handle?' active':'');
+    var ini=c.initials||initialsOf(c.name);
+    it.innerHTML='<div class="msg-av" style="background:'+c.color+'">'+ini+(c.online?'<span class="online"></span>':'')+'</div>'+
+      '<div class="msg-right"><div class="msg-row"><div class="msg-name">'+escapeHtml(c.handle)+'</div><div class="msg-time">'+escapeHtml(c.time)+'</div></div><div class="msg-preview">'+escapeHtml(c.preview)+'</div></div>'+
+      (c.unread?'<div class="msg-unread-badge">'+c.unread+'</div>':'');
+    it.addEventListener('click',function(){openConversation(c.handle);});
+    list.appendChild(it);
+  });
+}
+function openConversation(handle){
+  var c=null;for(var i=0;i<conversations.length;i++){if(conversations[i].handle===handle){c=conversations[i];break;}}
+  if(!c)return;
+  activeConv=c;c.unread=0;
+  document.getElementById('threadEmpty').style.display='none';
+  document.getElementById('threadView').style.display='flex';
+  var ini=c.initials||initialsOf(c.name);
+  document.getElementById('threadAv').style.background=c.color;
+  document.getElementById('threadAv').textContent=ini;
+  document.getElementById('threadName').textContent=c.name;
+  document.getElementById('threadHandle').textContent=c.handle;
+  renderThread();saveConversations();renderConversations();
+}
+function renderThread(){
+  var body=document.getElementById('threadBody');if(!body||!activeConv)return;body.innerHTML='';
+  activeConv.thread.forEach(function(m){
+    var b=document.createElement('div');b.className='bubble '+(m.from==='me'?'me':'them');
+    b.innerHTML=escapeHtml(m.text)+'<span class="t-time">'+escapeHtml(m.time||'')+'</span>';
+    body.appendChild(b);
+  });
+  body.scrollTop=body.scrollHeight;
+}
+function sendMessage(){
+  var inp=document.getElementById('msgInput');var t=inp.value.trim();if(!t||!activeConv)return;
+  activeConv.thread.push({from:'me',text:t,time:'now'});
+  activeConv.preview=t;activeConv.time='now';
+  inp.value='';renderThread();saveConversations();renderConversations();
+}
+
+// ── modal ──
+function openDealModal(){document.getElementById('dealModal').classList.add('open');}
+function closeDealModal(){document.getElementById('dealModal').classList.remove('open');}
+function submitDeal(e){
+  e.preventDefault();
+  var f=e.target;
+  var name=f.name.value.trim();if(!name)return false;
+  var company=f.company.value.trim()||'—';
+  var contact=f.contact.value.trim();
+  var stage=f.stage.value;
+  var valueNum=parseFloat(f.value.value)||0;
+  var value='$'+valueNum.toLocaleString('en-US');
+  var prob=Math.max(0,Math.min(100,parseInt(f.prob.value,10)||0));
+  var close=f.close.value?new Date(f.close.value).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
+  var initials=initialsOf(contact)||'??';
+  var color=pickColor(contact);
+  var stageClass={Discovery:'s-disc',Qualified:'s-qual',Proposal:'s-prop',Negotiation:'s-neg','Closed Won':'s-closed'}[stage]||'s-disc';
+  var d={name:name,company:company,contact:contact,initials:initials,color:color,stage:stage,stageClass:stageClass,value:value,prob:prob,close:close,
+    timeline:[{title:'Deal created',time:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})}]};
+  deals.push(d);store.set('greyola_deals',deals);
+  renderAllDeals();renderAnalytics();updateKpi();
+  closeDealModal();f.reset();toast('Deal "'+name+'" created');
+  return false;
+}
+
+// ── export ──
+function downloadCSV(name,rows){
+  var csv=rows.map(function(r){return r.map(function(c){c=String(c);return /[",\n]/.test(c)?'"'+c.replace(/"/g,'""')+'"':c;}).join(',');}).join('\r\n');
+  var blob=new Blob([csv],{type:'text/csv'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href);
+}
+function exportDeals(){
+  var rows=[['Deal','Company','Contact','Stage','Value','Win %','Close Date']];
+  deals.forEach(function(d){rows.push([d.name,d.company,d.contact,d.stage,parseVal(d.value),d.prob,d.close]);});
+  downloadCSV('greyola-deals.csv',rows);toast('Deals exported');
+}
+function exportContacts(){
+  var rows=[['Name','Role','Company','Total Value','Deals']];
+  getContacts().forEach(function(c){rows.push([c.name,c.role,c.company,c.value,c.count]);});
+  downloadCSV('greyola-contacts.csv',rows);toast('Contacts exported');
+}
+
+// ── notifications ──
+function resolveNotif(btn,action){
+  var item=btn.closest('.notif-item');if(!item)return;
+  item.classList.add('resolving');
+  setTimeout(function(){if(item.parentNode)item.parentNode.removeChild(item);updateNotifCount();},280);
+  toast(action==='accept'?'Transaction accepted':'Transaction declined');
+}
+function updateNotifCount(){
+  var unread=document.querySelectorAll('.notif-item:not(.read)').length;
+  var tabs=document.querySelectorAll('.ntab');
+  if(tabs[1]){var s=tabs[1].querySelector('span');if(s)s.textContent=unread;if(unread===0)tabs[1].style.display='none';}
+}
+
+// ── CALENDAR ──
+var calState={y:new Date().getFullYear(),m:new Date().getMonth(),sel:null};
+var MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+function parseCloseDate(s){try{var d=new Date(s);return isNaN(d)?null:d;}catch(e){return null;}}
+function dealEvents(){return (typeof deals!=='undefined'?deals:[]).filter(function(d){return d.close&&parseCloseDate(d.close);}).map(function(d){var dt=parseCloseDate(d.close);return {y:dt.getFullYear(),m:dt.getMonth(),d:dt.getDate(),name:d.name,value:d.value,stage:d.stage,stageClass:d.stageClass,color:d.color};});}
+function renderCalendar(){
+  var days=document.getElementById('calDays');if(!days)return;
+  var evs=dealEvents();
+  var first=new Date(calState.y,calState.m,1);
+  var startDay=first.getDay();
+  var daysInMonth=new Date(calState.y,calState.m+1,0).getDate();
+  var prevDays=new Date(calState.y,calState.m,0).getDate();
+  var today=new Date();
+  var html='';
+  for(var i=0;i<startDay;i++){var dn=prevDays-startDay+1+i;html+='<div class="cal-day out"><div class="cal-dnum">'+dn+'</div></div>';}
+  for(var d=1;d<=daysInMonth;d++){
+    var cls='cal-day';var isToday=(d===today.getDate()&&calState.m===today.getMonth()&&calState.y===today.getFullYear());
+    if(isToday)cls+=' today';
+    if(calState.sel&&calState.sel.d===d&&calState.sel.m===calState.m&&calState.sel.y===calState.y)cls+=' sel';
+    var dayEvs=evs.filter(function(e){return e.y===calState.y&&e.m===calState.m&&e.d===d;});
+    var evHtml='';
+    dayEvs.slice(0,3).forEach(function(e){evHtml+='<div class="cal-ev" style="background:'+e.color+'" title="'+escapeHtml(e.name)+'">'+escapeHtml(e.name)+'</div>';});
+    if(dayEvs.length>3)evHtml+='<div class="cal-more">+'+(dayEvs.length-3)+' more</div>';
+    html+='<div class="'+cls+'" data-d="'+d+'" onclick="calSelectDay('+d+')"><div class="cal-dnum">'+d+'</div><div class="cal-events">'+evHtml+'</div></div>';
+  }
+  var total=startDay+daysInMonth;
+  var trailing=total%7===0?0:7-(total%7);
+  for(var t=1;t<=trailing;t++){html+='<div class="cal-day out"><div class="cal-dnum">'+t+'</div></div>';}
+  days.innerHTML=html;
+  document.getElementById('calMonth').textContent=MONTHS[calState.m]+' '+calState.y;
+  renderCalSide();
+}
+function calShift(n){calState.m+=n;if(calState.m<0){calState.m=11;calState.y--;}if(calState.m>11){calState.m=0;calState.y++;}renderCalendar();}
+function goToday(){var t=new Date();calState.y=t.getFullYear();calState.m=t.getMonth();calState.sel=null;renderCalendar();}
+function calSelectDay(d){calState.sel={y:calState.y,m:calState.m,d:d};renderCalendar();renderCalSide();}
+function renderCalSide(){
+  var list=document.getElementById('calSideList');if(!list)return;
+  var title=document.getElementById('calSideTitle'),sub=document.getElementById('calSideSub');
+  if(calState.sel){
+    var ds=dealEvents().filter(function(e){return e.y===calState.sel.y&&e.m===calState.sel.m&&e.d===calState.sel.d;});
+    title.textContent='On '+MONTHS[calState.sel.m].slice(0,3)+' '+calState.sel.d;
+    sub.textContent=ds.length+' closing'+(ds.length!==1?'s':'');
+    if(!ds.length){list.innerHTML='<div class="cal-empty">No deals close on this day.</div>';return;}
+    list.innerHTML=ds.map(function(e){return calRow(e);}).join('');
+  }else{
+    var sorted=dealEvents().slice().sort(function(a,b){return new Date(a.y,a.m,a.d)-new Date(b.y,b.m,b.d);});
+    var now=new Date();now.setHours(0,0,0,0);
+    var upcoming=sorted.filter(function(e){return new Date(e.y,e.m,e.d)>=now;}).slice(0,5);
+    title.textContent='Upcoming';
+    sub.textContent='Next '+upcoming.length+' closings';
+    if(!upcoming.length){list.innerHTML='<div class="cal-empty">No upcoming close dates.</div>';return;}
+    list.innerHTML=upcoming.map(function(e){return calRow(e);}).join('');
+  }
+}
+function calRow(e){
+  return '<div class="pb-item" onclick="showView(\'deals\')"><div class="pb-icon" style="background:'+e.color+'">'+initialsOf(e.name)+'</div>'+
+    '<div class="pb-info"><div class="pb-name">'+escapeHtml(e.name)+'</div><div class="pb-meta">'+(e.m+1)+'/'+e.d+'/'+e.y+' · '+escapeHtml(e.stage)+'</div></div>'+
+    '<div class="pb-right"><div class="pb-amount">'+escapeHtml(e.value)+'</div></div></div>';
+}
+
+// ── SETTINGS ──
+var SETTINGS_DEFAULT={reduceMotion:false,compact:false,accent:'#4ade80',landing:'overview',profile:{name:'',company:'',email:'',role:''}};
+var ACCENTS=['#4ade80','#667eea','#ec4899','#f59e0b','#8b5cf6','#0ea5e9','#ef4444','#14b8a6'];
+var settings=loadSettings();
+function loadSettings(){var s=store.get('greyola_settings',null);if(!s)return Object.assign({},SETTINGS_DEFAULT);return Object.assign({},SETTINGS_DEFAULT,s);}
+function saveSettings(){store.set('greyola_settings',settings);}
+function applySetting(key,val){settings[key]=val;saveSettings();applyAppearance();if(key==='landing')toast('Landing view set to '+val);}
+function applyAppearance(){
+  var root=document.documentElement;
+  root.style.setProperty('--green',settings.accent);
+  // derive a darker shade for --green-dark
+  try{var c=settings.accent.replace('#','');if(c.length===3)c=c.split('').map(function(x){return x+x;}).join('');var r=parseInt(c.slice(0,2),16),g=parseInt(c.slice(2,4),16),b=parseInt(c.slice(4,6),16);var dr=Math.max(0,r-90),dg=Math.max(0,g-90),db=Math.max(0,b-90);root.style.setProperty('--green-dark','rgb('+dr+','+dg+','+db+')');}catch(e){}
+  document.body.classList.toggle('reduce-motion',!!settings.reduceMotion);
+  document.body.classList.toggle('compact',!!settings.compact);
+}
+function renderSettings(){
+  var p=settings.profile||{};
+  var n=document.getElementById('setName'),c=document.getElementById('setCompany'),em=document.getElementById('setEmail'),r=document.getElementById('setRole');
+  if(n)n.value=p.name||'';if(c)c.value=p.company||'';if(em)em.value=p.email||'';if(r)r.value=p.role||'';
+  var rm=document.getElementById('setReduceMotion');if(rm)rm.checked=!!settings.reduceMotion;
+  var cp=document.getElementById('setCompact');if(cp)cp.checked=!!settings.compact;
+  var ld=document.getElementById('setLanding');if(ld)ld.value=settings.landing||'overview';
+  // profile header preview
+  var pn=document.getElementById('setProfileName'),pr=document.getElementById('setProfileRole'),pav=document.getElementById('setProfileAv');
+  var disp=p.name||'Greyola';if(pn)pn.textContent=disp;if(pr)pr.textContent=p.role||p.company||'Your workspace';if(pav)pav.textContent=initialsOf(disp);
+  // accent swatches
+  var row=document.getElementById('accentRow');if(row){
+    row.innerHTML='';
+    ACCENTS.forEach(function(a){var dot=document.createElement('div');dot.className='accent-dot'+(a===settings.accent?' sel':'');dot.style.background=a;dot.title=a;dot.addEventListener('click',function(){settings.accent=a;saveSettings();renderSettings();applyAppearance();toast('Accent updated');});row.appendChild(dot);});
+  }
+}
+function saveProfile(){
+  settings.profile={name:document.getElementById('setName').value.trim(),company:document.getElementById('setCompany').value.trim(),email:document.getElementById('setEmail').value.trim(),role:document.getElementById('setRole').value.trim()};
+  saveSettings();renderSettings();toast('Profile saved');
+}
+function clearAllData(){
+  if(!window.confirm('Clear ALL CRM data? This removes deals, messages and settings and cannot be undone.'))return;
+  ['greyola_deals','greyola_conversations','greyola_settings'].forEach(function(k){try{localStorage.removeItem(k);}catch(e){}});
+  toast('All data cleared — reloading');
+  setTimeout(function(){location.reload();},700);
+}
+
+// ── wiring ──
+document.querySelectorAll('.s-icon').forEach(function(el){
+  var v=SIDEBAR_VIEW[el.title];if(!v)return;
+  el.addEventListener('click',function(){showView(v);});
+});
+document.querySelectorAll('.nav-tab').forEach(function(el){
+  var v=NAV_VIEW[el.textContent.trim()];if(v)el.addEventListener('click',function(){showView(v);});
+});
+// overview messages card -> open conversation
+var msgTitle=null;
+document.querySelectorAll('.card-title').forEach(function(e){if(e.textContent.trim()==='Messages')msgTitle=e;});
+var msgCard=msgTitle?msgTitle.closest('.card'):null;
+if(msgCard){
+  msgCard.querySelectorAll('.msg-item').forEach(function(el,i){
+    el.addEventListener('click',function(){var c=conversations[i];if(c){showView('messages');openConversation(c.handle);}});
+  });
+}
+// notifications: mark read on click
+document.querySelectorAll('.notif-item').forEach(function(el){
+  el.addEventListener('click',function(e){if(e.target.closest('button'))return;el.classList.add('read');updateNotifCount();});
+});
+// top buttons
+var nd=document.querySelector('.page-actions .tn-btn.primary');if(nd)nd.addEventListener('click',openDealModal);
+var ex=document.querySelector('.page-actions .tn-btn:not(.primary)');if(ex)ex.addEventListener('click',exportDeals);
+var am=document.querySelector('.topnav .tn-btn.primary');if(am)am.addEventListener('click',function(){toast('Invite link copied to clipboard');});
+// ESC closes overlays
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closePanel();closeContactPanel();closeDealModal();}});
+
+// apply saved appearance + landing view on startup
+applyAppearance();
+var landingView = (settings && settings.landing) ? settings.landing : 'overview';
+if(landingView!=='overview'){ /* keep default overview loaded first for charts; show landing after */ }
+
+// initial render
+renderAllDeals();
+renderAnalytics();
+renderConversations();
+updateNotifCount();
+// honor landing view preference (overview already active by default)
+if(landingView && landingView!=='overview'){ showView(landingView); }
+</script>
+
+</body>
+</html>
