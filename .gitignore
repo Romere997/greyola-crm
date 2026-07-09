@@ -1,0 +1,19 @@
+# Build artifacts (large binaries — ship via GitHub Releases, not git)
+build/
+dist/
+__pycache__/
+*.pyc
+
+# Installer staging (contains the built .exe)
+installer/payload/
+
+# Logs
+*.log
+
+# OS cruft
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# The bundled copy under assets/ is regenerated from the root source at build time
+assets/crm.html
