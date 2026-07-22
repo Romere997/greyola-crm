@@ -98,6 +98,6 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=os.path.join(app_dir, '..', 'greyola.ico'),
+    icon=os.path.join(app_dir, 'greyola.ico'),
     version=version_info,
 )
