@@ -36,6 +36,13 @@ a = Analysis(
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
+# ---------------------------------------------------------------------------
+# Version note (informational only on Linux; PyInstaller does not embed a
+# Windows-style VERSION resource on this platform). Greyola CRM release:
+# APP_VERSION = 1.1.0  (kept in sync with launcher.py / linux_launcher.py
+# and CHANGELOG.md).
+# ---------------------------------------------------------------------------
+
 exe = EXE(
     pyz,
     a.scripts,

@@ -1,0 +1,60 @@
+name: Build Windows (Greyola CRM.exe)
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    name: Build one-file Windows binary
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Python build deps
+        run: pip install pywebview pyinstaller pillow
+
+      - name: Sync front-end + build
+        run: |
+          mkdir -p assets
+          cp "Greyola CRM.html" assets/crm.html
+          python -m PyInstaller build.spec --noconfirm --clean
+
+      - name: Smoke test the binary
+        run: |
+          python - <<'PY'
+          import os
+          exe = os.path.join("dist", "Greyola CRM.exe")
+          assert os.path.isfile(exe), "dist/Greyola CRM.exe not built"
+          print("BINARY_PRESENT")
+          # The HTML copied into assets/ is what gets bundled into the .exe.
+          html_path = os.path.join("assets", "crm.html")
+          with open(html_path, "r", encoding="utf-8") as fh:
+              html = fh.read()
+          assert "view-calendar" in html, "bundled front-end missing Calendar"
+          print("BUNDLED_HTML_OK")
+          PY
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: greyola-crm-windows
+          path: dist/Greyola CRM.exe
+          if-no-files-found: error
+
+      - name: Attach to release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/Greyola CRM.exe

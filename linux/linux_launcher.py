@@ -18,6 +18,9 @@ import os
 import sys
 import webview
 
+# Greyola CRM release version (bumped per CHANGELOG.md).
+APP_VERSION = '1.1.0'
+
 
 # ---------------------------------------------------------------------------
 # Locate the CRM front-end (read from the source file at build time).

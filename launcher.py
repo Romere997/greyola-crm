@@ -10,6 +10,9 @@ import json
 import shutil
 import webview
 
+# Greyola CRM release version (bumped per CHANGELOG.md).
+APP_VERSION = '1.1.0'
+
 # ---------------------------------------------------------------------------
 # Embed the CRM front-end (read from the source file at build time).
 # ---------------------------------------------------------------------------

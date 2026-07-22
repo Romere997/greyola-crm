@@ -30,7 +30,28 @@
   --shadow-lg:0 12px 40px rgba(0,0,0,.14),0 4px 16px rgba(0,0,0,.06);
 }
 
-body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text-primary);display:flex;min-height:100vh;font-size:14px;line-height:1.5;overflow-x:hidden}
+/* ── DARK MODE PALETTE ── */
+[data-theme='dark']{
+  --bg:#0f1115;
+  --surface:#1a1d24;
+  --surface2:#232730;
+  --border:#2a2f3a;
+  --border2:#2a2f3a;
+  --text-primary:#f2f3f5;
+  --text-secondary:#aab1bd;
+  --text-muted:#7c828d;
+  --green:#4ade80;
+  --green-dark:#22c55e;
+  --green-bg:#16321f;
+  --red:#fb7185;
+  --red-bg:#3a1d24;
+  --black:#000000;
+  --shadow:0 1px 3px rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.3);
+  --shadow-md:0 4px 16px rgba(0,0,0,.5),0 2px 6px rgba(0,0,0,.3);
+  --shadow-lg:0 12px 40px rgba(0,0,0,.6),0 4px 16px rgba(0,0,0,.4);
+}
+
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text-primary);display:flex;min-height:100vh;font-size:14px;line-height:1.5;overflow-x:hidden;transition:background .25s,color .25s}
 
 /* ── SIDEBAR ── */
 .sidebar{
@@ -93,6 +114,9 @@ body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(-
 .nav-tab.active{background:var(--black);color:#fff}
 .nav-tab:hover:not(.active){background:var(--bg)}
 .topnav-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
+.top-search{display:flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:6px 11px;width:200px}
+.top-search input{border:none;background:transparent;outline:none;font-size:12px;font-family:inherit;color:var(--text-primary);width:100%}
+.top-search input::placeholder{color:var(--text-muted)}
 .team-avs{display:flex;align-items:center}
 .tav{
   width:26px;height:26px;border-radius:50%;border:2px solid var(--surface);
@@ -247,7 +271,13 @@ canvas#revenueChart{width:100%;cursor:crosshair}
 .s-qual{background:var(--green-bg);color:var(--green-dark)}
 .s-disc{background:#fff7ed;color:#c2410c}
 .s-closed{background:#dcfce7;color:#15803d}
+.s-lost{background:#fef2f2;color:#b91c1c}
 .deal-val{font-weight:800;font-size:13px;letter-spacing:-.3px}
+.deal-actions{display:flex;gap:5px;flex-wrap:wrap}
+.mini-btn{font-family:inherit;font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--text-secondary);cursor:pointer;transition:all .12s;white-space:nowrap}
+.mini-btn:hover{background:var(--bg)}
+.mini-btn.won:hover,.mini-btn.won.active{background:var(--green-bg);color:var(--green-dark);border-color:var(--green-dark)}
+.mini-btn.lost:hover{background:var(--red-bg);color:var(--red);border-color:var(--red)}
 .prob-wrap{width:72px}
 .prob-lbl{font-size:9.5px;color:var(--text-muted);margin-bottom:3px;font-weight:600}
 .prob-track{height:4px;background:var(--border);border-radius:2px}
@@ -777,9 +807,9 @@ body.compact .cal-day{min-height:62px}
     </button>
   </div>
   <div class="panel-actions">
-    <button class="p-btn">📞 Call</button>
-    <button class="p-btn">✉️ Email</button>
-    <button class="p-btn primary">Edit Deal</button>
+    <button class="p-btn" id="panelCallBtn">📞 Call</button>
+    <button class="p-btn" id="panelEmailBtn">✉️ Email</button>
+    <button class="p-btn primary" id="panelEditBtn">Edit Deal</button>
   </div>
   <div class="panel-badge-row" id="panelBadges"></div>
   <div class="panel-body">
@@ -831,6 +861,10 @@ body.compact .cal-day{min-height:62px}
       <div class="nav-tab">Activity</div>
     </div>
     <div class="topnav-right">
+      <div class="top-search">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9c9c99" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="globalSearch" placeholder="Search deals &amp; contacts…" oninput="onGlobalSearch()"/>
+      </div>
       <div class="team-avs">
         <div class="tav" style="background:#667eea;z-index:5">AM</div>
         <div class="tav" style="background:#f59e0b;z-index:4">JL</div>
@@ -1118,6 +1152,7 @@ body.compact .cal-day{min-height:62px}
                   <th>Value</th>
                   <th>Close Date</th>
                   <th>Win %</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="dealTableBody"></tbody>
@@ -1348,7 +1383,7 @@ body.compact .cal-day{min-height:62px}
     </div>
     <div style="overflow-x:auto">
       <table class="deal-table">
-        <thead><tr><th>Deal</th><th>Contact</th><th>Stage</th><th>Value</th><th>Close Date</th><th>Win %</th></tr></thead>
+        <thead><tr><th>Deal</th><th>Contact</th><th>Stage</th><th>Value</th><th>Close Date</th><th>Win %</th><th>Actions</th></tr></thead>
         <tbody id="dealsViewBody"></tbody>
       </table>
     </div>
@@ -1480,6 +1515,10 @@ body.compact .cal-day{min-height:62px}
       <div class="card-hd"><div><div class="card-title">Appearance</div></div></div>
       <div class="card-body" style="padding:18px">
         <div class="set-row">
+          <div><div class="sr-label">Dark mode</div><div class="sr-sub">Switch to a darker palette</div></div>
+          <label class="switch"><input type="checkbox" id="setDark" onchange="applySetting('dark',this.checked)"/><span class="track"></span><span class="knob"></span></label>
+        </div>
+        <div class="set-row">
           <div><div class="sr-label">Reduce motion</div><div class="sr-sub">Disable entrance animations</div></div>
           <label class="switch"><input type="checkbox" id="setReduceMotion" onchange="applySetting('reduceMotion',this.checked)"/><span class="track"></span><span class="knob"></span></label>
         </div>
@@ -1529,6 +1568,10 @@ body.compact .cal-day{min-height:62px}
 
 <script>
 
+// Live search term read directly from the input box (avoids cross-<script>-block
+// var scoping issues — render functions live in block 1, the search box handler in block 2).
+function _searchTerm(){var el=document.getElementById('globalSearch');return el?(el.value||'').trim().toLowerCase():'';}
+
 // ── PERSISTENCE ──
 const store={get(k,d){try{const v=localStorage.getItem(k);return v!==null?JSON.parse(v):d;}catch(e){return d;}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
 function parseVal(v){const n=String(v).replace(/[^0-9.]/g,'');return parseFloat(n)||0;}
@@ -1565,7 +1608,9 @@ deals.forEach((d,i) => {
 });
 
 // ── PANEL ──
+var currentPanelDeal=null;
 function openPanel(d) {
+  currentPanelDeal=d;
   document.getElementById('panelTitle').textContent = d.name;
   document.getElementById('panelCompany').textContent = d.company;
   document.getElementById('panelValue').textContent = d.value;
@@ -1590,6 +1635,35 @@ function openPanel(d) {
 function closePanel() {
   document.getElementById('overlay').classList.remove('open');
   document.getElementById('sidePanel').classList.remove('open');
+  currentPanelDeal=null;
+}
+function contactPhone(name){var c=null;getContacts().forEach(function(x){if(x.name===name)c=x;});return c&&c.phone?c.phone:null;}
+function contactEmail(name){var c=null;getContacts().forEach(function(x){if(x.name===name)c=x;});return c&&c.email?c.email:null;}
+function callDeal(d){
+  var phone=contactPhone(d.contact)||d.phone||'';
+  if(phone)window.location.href='tel:'+phone;
+  toast('Calling '+(d.contact||d.name)+(phone?' ('+phone+')':''));
+}
+function emailDeal(d){
+  var email=contactEmail(d.contact)||d.email||'';
+  window.location.href='mailto:'+email+'?subject='+encodeURIComponent('Re: '+d.name);
+  toast('Emailing '+(d.contact||d.name));
+}
+function openEditDeal(d){
+  if(!d){if(currentPanelDeal)d=currentPanelDeal;else return;}
+  var f=document.getElementById('dealForm');
+  if(!f)return;
+  editingDealId=d.id;
+  f.name.value=d.name||'';
+  f.company.value=d.company&&d.company!=='—'?d.company:'';
+  f.contact.value=d.contact||'';
+  f.stage.value=d.stage||'Discovery';
+  f.value.value=parseVal(d.value)||0;
+  f.prob.value=d.prob||0;
+  if(d.close){var dt=parseCloseDate(d.close);if(dt)f.close.value=dt.getFullYear()+'-'+('0'+(dt.getMonth()+1)).slice(-2)+'-'+('0'+dt.getDate()).slice(-2);}
+  document.querySelector('#dealModal .modal-hd .card-title').textContent='Edit Deal';
+  var sb=document.querySelector('#dealModal .modal-ft .primary');if(sb)sb.textContent='Save Changes';
+  document.getElementById('dealModal').classList.add('open');
 }
 
 // ── KPI COUNTER ──
@@ -1881,6 +1955,22 @@ function showView(name){
 }
 
 // ── deals ──
+function ensureDealIds(){var n=0,changed=false;deals.forEach(function(d){if(!d.id){d.id='d'+(++n)+'_'+Math.random().toString(36).slice(2,8);changed=true;}});if(changed)store.set('greyola_deals',deals);}
+ensureDealIds();
+function findDeal(id){for(var i=0;i<deals.length;i++)if(deals[i].id===id)return deals[i];return null;}
+function stageClassFor(stage){return {Discovery:'s-disc',Qualified:'s-qual',Proposal:'s-prop',Negotiation:'s-neg','Closed Won':'s-closed','Closed Lost':'s-lost'}[stage]||'s-disc';}
+function markDeal(id,stage){
+  var d=findDeal(id);if(!d)return;
+  d.stage=stage;d.stageClass=stageClassFor(stage);
+  if(stage==='Closed Won')d.prob=100;
+  if(stage==='Closed Lost')d.prob=0;
+  if(!d.timeline)d.timeline=[];
+  d.timeline.unshift({title:'Marked '+stage,time:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})});
+  store.set('greyola_deals',deals);
+  renderAllDeals();renderAnalytics();updateKpi();
+  if(typeof currentPanelDeal!=='undefined'&&currentPanelDeal&&currentPanelDeal.id===id){currentPanelDeal=d;openPanel(d);}
+  toast('Deal marked '+stage);
+}
 function dealRow(d){
   var tr=document.createElement('tr');
   tr.innerHTML='<td><div class="deal-name">'+escapeHtml(d.name)+'</div><div class="deal-co">'+escapeHtml(d.company)+'</div></td>'+
@@ -1888,7 +1978,8 @@ function dealRow(d){
     '<td><span class="stage-pill '+d.stageClass+'">'+escapeHtml(d.stage)+'</span></td>'+
     '<td><div class="deal-val">'+escapeHtml(d.value)+'</div></td>'+
     '<td style="font-size:12px;color:var(--text-secondary)">'+escapeHtml(d.close)+'</td>'+
-    '<td><div class="prob-wrap"><div class="prob-lbl">'+d.prob+'%</div><div class="prob-track"><div class="prob-fill" style="width:'+d.prob+'%"></div></div></div></td>';
+    '<td><div class="prob-wrap"><div class="prob-lbl">'+d.prob+'%</div><div class="prob-track"><div class="prob-fill" style="width:'+d.prob+'%"></div></div></div></td>'+
+    '<td><div class="deal-actions"><button class="mini-btn won'+(d.stage==='Closed Won'?' active':'')+'" onclick="event.stopPropagation();markDeal(\''+d.id+'\',\'Closed Won\')">Won</button><button class="mini-btn lost'+(d.stage==='Closed Won'||d.stage==='Closed Lost'?'':'')+'" onclick="event.stopPropagation();markDeal(\''+d.id+'\',\'Closed Lost\')">Lost</button></div></td>';
   tr.addEventListener('click',function(){openPanel(d);});
   return tr;
 }
@@ -1896,12 +1987,19 @@ function renderDealsView(){
   var f=document.getElementById('dealStageFilter');var fv=f?f.value:'';
   var vb=document.getElementById('dealsViewBody');if(!vb)return;
   vb.innerHTML='';
-  var list=deals.filter(function(d){return !fv||d.stage===fv;});
+  var list=deals.filter(function(d){if(fv&&d.stage!==fv)return false;if(_searchTerm()&&(d.name+' '+d.company+' '+d.contact).toLowerCase().indexOf(_searchTerm())<0)return false;return true;});
   list.forEach(function(d){vb.appendChild(dealRow(d));});
-  var sub=document.getElementById('dealsCountSub');if(sub)sub.textContent=list.length+' deal'+(list.length!==1?'s':'')+(fv?' · '+fv:'');
+  var sub=document.getElementById('dealsCountSub');if(sub)sub.textContent=list.length+' deal'+(list.length!==1?'s':'')+(fv?' · '+fv:'')+(_searchTerm()?' · filtered':'');
 }
 function renderAllDeals(){
-  var ob=document.getElementById('dealTableBody');if(ob){ob.innerHTML='';deals.forEach(function(d){ob.appendChild(dealRow(d));});}
+  var ob=document.getElementById('dealTableBody');
+  if(ob){
+    ob.innerHTML='';
+    deals.filter(function(d){
+      if(_searchTerm() && (d.name+' '+d.company+' '+d.contact).toLowerCase().indexOf(_searchTerm())<0) return false;
+      return true;
+    }).forEach(function(d){ob.appendChild(dealRow(d));});
+  }
   renderDealsView();
 }
 function updateKpi(){var el=document.getElementById('kpi1');if(el)animateCount('kpi1',totalPipeline(),'$',true);}
@@ -1917,7 +2015,10 @@ function getContacts(){
 }
 function renderContacts(){
   var g=document.getElementById('contactGrid');if(!g)return;g.innerHTML='';
-  getContacts().forEach(function(c){
+  var list=getContacts();
+  var _st=_searchTerm();
+  if(_st)list=list.filter(function(c){((''+(c.name||'')+' '+(c.company||'')+' '+(c.email||'')+' '+(c.role||'')).toLowerCase().indexOf(_st)>=0);});
+  list.forEach(function(c){
     var card=document.createElement('div');card.className='contact-card';
     card.innerHTML='<div class="cc-top"><div class="cc-av" style="background:'+c.color+'">'+c.initials+'</div><div><div class="cc-name">'+escapeHtml(c.name)+'</div><div class="cc-role">'+escapeHtml(c.role)+'</div></div></div>'+
       '<div class="cc-value">$'+c.value.toLocaleString('en-US')+' · '+c.count+' deal'+(c.count>1?'s':'')+'</div>'+
@@ -2006,8 +2107,9 @@ function sendMessage(){
 }
 
 // ── modal ──
-function openDealModal(){document.getElementById('dealModal').classList.add('open');}
-function closeDealModal(){document.getElementById('dealModal').classList.remove('open');}
+var editingDealId=null;
+function openDealModal(){editingDealId=null;var f=document.getElementById('dealForm');if(f)f.reset();var t=document.querySelector('#dealModal .modal-hd .card-title');if(t)t.textContent='New Deal';var sb=document.querySelector('#dealModal .modal-ft .primary');if(sb)sb.textContent='Create Deal';document.getElementById('dealModal').classList.add('open');}
+function closeDealModal(){editingDealId=null;var f=document.getElementById('dealForm');if(f)f.reset();var t=document.querySelector('#dealModal .modal-hd .card-title');if(t)t.textContent='New Deal';var sb=document.querySelector('#dealModal .modal-ft .primary');if(sb)sb.textContent='Create Deal';document.getElementById('dealModal').classList.remove('open');}
 function submitDeal(e){
   e.preventDefault();
   var f=e.target;
@@ -2021,12 +2123,25 @@ function submitDeal(e){
   var close=f.close.value?new Date(f.close.value).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):'—';
   var initials=initialsOf(contact)||'??';
   var color=pickColor(contact);
-  var stageClass={Discovery:'s-disc',Qualified:'s-qual',Proposal:'s-prop',Negotiation:'s-neg','Closed Won':'s-closed'}[stage]||'s-disc';
-  var d={name:name,company:company,contact:contact,initials:initials,color:color,stage:stage,stageClass:stageClass,value:value,prob:prob,close:close,
+  var stageClass=stageClassFor(stage);
+  if(editingDealId){
+    var d=findDeal(editingDealId);
+    if(d){
+      d.name=name;d.company=company;d.contact=contact;d.initials=initials;d.color=color;d.stage=stage;d.stageClass=stageClass;d.value=value;d.prob=prob;d.close=close;
+      if(!d.timeline)d.timeline=[];
+      d.timeline.unshift({title:'Deal updated',time:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})});
+    }
+    store.set('greyola_deals',deals);
+    renderAllDeals();renderAnalytics();updateKpi();renderCalendar();
+    closeDealModal();
+    toast('Deal "'+name+'" updated');
+    return false;
+  }
+  var nd={name:name,company:company,contact:contact,initials:initials,color:color,stage:stage,stageClass:stageClass,value:value,prob:prob,close:close,
     timeline:[{title:'Deal created',time:new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'})}]};
-  deals.push(d);store.set('greyola_deals',deals);
-  renderAllDeals();renderAnalytics();updateKpi();
-  closeDealModal();f.reset();toast('Deal "'+name+'" created');
+  deals.push(nd);store.set('greyola_deals',deals);
+  renderAllDeals();renderAnalytics();updateKpi();renderCalendar();
+  closeDealModal();toast('Deal "'+name+'" created');
   return false;
 }
 
@@ -2133,6 +2248,7 @@ function applyAppearance(){
   try{var c=settings.accent.replace('#','');if(c.length===3)c=c.split('').map(function(x){return x+x;}).join('');var r=parseInt(c.slice(0,2),16),g=parseInt(c.slice(2,4),16),b=parseInt(c.slice(4,6),16);var dr=Math.max(0,r-90),dg=Math.max(0,g-90),db=Math.max(0,b-90);root.style.setProperty('--green-dark','rgb('+dr+','+dg+','+db+')');}catch(e){}
   document.body.classList.toggle('reduce-motion',!!settings.reduceMotion);
   document.body.classList.toggle('compact',!!settings.compact);
+  if(settings.dark){root.dataset.theme='dark';}else{delete root.dataset.theme;}
 }
 function renderSettings(){
   var p=settings.profile||{};
@@ -2140,6 +2256,7 @@ function renderSettings(){
   if(n)n.value=p.name||'';if(c)c.value=p.company||'';if(em)em.value=p.email||'';if(r)r.value=p.role||'';
   var rm=document.getElementById('setReduceMotion');if(rm)rm.checked=!!settings.reduceMotion;
   var cp=document.getElementById('setCompact');if(cp)cp.checked=!!settings.compact;
+  var sd=document.getElementById('setDark');if(sd)sd.checked=!!settings.dark;
   var ld=document.getElementById('setLanding');if(ld)ld.value=settings.landing||'overview';
   // profile header preview
   var pn=document.getElementById('setProfileName'),pr=document.getElementById('setProfileRole'),pav=document.getElementById('setProfileAv');
@@ -2161,7 +2278,15 @@ function clearAllData(){
   setTimeout(function(){location.reload();},700);
 }
 
-// ── wiring ──
+// ── global search ──
+function onGlobalSearch(){
+  var active=document.querySelector('.view.active');
+  var name=active?active.id.replace('view-',''):'';
+  if(name==='deals')renderDealsView();
+  else if(name==='contacts')renderContacts();
+  else if(name==='overview'){renderAllDeals();if(typeof renderContacts==='function'&&document.getElementById('contactGrid'))renderContacts();}
+  else toast('Switch to Deals or Contacts to filter');
+}
 document.querySelectorAll('.s-icon').forEach(function(el){
   var v=SIDEBAR_VIEW[el.title];if(!v)return;
   el.addEventListener('click',function(){showView(v);});
@@ -2182,7 +2307,10 @@ if(msgCard){
 document.querySelectorAll('.notif-item').forEach(function(el){
   el.addEventListener('click',function(e){if(e.target.closest('button'))return;el.classList.add('read');updateNotifCount();});
 });
-// top buttons
+// panel action buttons
+var pcb=document.getElementById('panelCallBtn');if(pcb)pcb.addEventListener('click',function(){if(currentPanelDeal)callDeal(currentPanelDeal);});
+var peb=document.getElementById('panelEmailBtn');if(peb)peb.addEventListener('click',function(){if(currentPanelDeal)emailDeal(currentPanelDeal);});
+var peBtn=document.getElementById('panelEditBtn');if(peBtn)peBtn.addEventListener('click',function(){openEditDeal(currentPanelDeal);});
 var nd=document.querySelector('.page-actions .tn-btn.primary');if(nd)nd.addEventListener('click',openDealModal);
 var ex=document.querySelector('.page-actions .tn-btn:not(.primary)');if(ex)ex.addEventListener('click',exportDeals);
 var am=document.querySelector('.topnav .tn-btn.primary');if(am)am.addEventListener('click',function(){toast('Invite link copied to clipboard');});
